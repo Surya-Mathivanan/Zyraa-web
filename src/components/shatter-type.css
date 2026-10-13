@@ -1,0 +1,75 @@
+.shatter {
+  position: relative;
+  width: 100%;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.shatter-sizer {
+  position: relative;
+  visibility: hidden;
+  margin: 0;
+}
+
+.shatter-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.shatter-shard {
+  position: absolute;
+  inset: 0;
+  will-change: transform, opacity;
+}
+
+.shatter-inner {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.shatter-copy {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  display: block;
+  font: inherit;
+  color: inherit;
+}
+
+/* Each shard copy must match the sizer's typography exactly. */
+.shatter .shatter-sizer,
+.shatter .shatter-copy {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  text-align: inherit;
+  white-space: inherit;
+}
+
+.shatter-facet {
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+.shatter-hint {
+  position: absolute;
+  left: 0;
+  bottom: -32px;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  pointer-events: none;
+}

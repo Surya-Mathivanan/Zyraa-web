@@ -1,0 +1,341 @@
+.footer {
+  position: relative;
+  padding: 0 var(--side-space);
+  background: var(--ink);
+  border-top: 1px solid var(--line);
+  color: #fff;
+  overflow: hidden;
+}
+
+/* ───────────── CTA band ───────────── */
+.footer-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 34px;
+  padding: clamp(50px, 7vw, 96px) 0 clamp(40px, 5vw, 70px);
+  border-bottom: 1px solid var(--line);
+}
+
+.footer-cta-kicker {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.footer-cta-title {
+  margin-top: 16px;
+  max-width: 20ch;
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4.4vw, 62px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.footer-cta-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 18px;
+}
+
+.footer-cta-phone {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 2.8vw, 38px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  color: var(--violet);
+  transition: opacity 280ms ease;
+}
+
+.footer-cta-phone:hover {
+  opacity: 0.78;
+}
+
+/* ───────────── Link grid ───────────── */
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.7fr 0.8fr 1.3fr 1fr 1fr;
+  gap: 36px;
+  padding: clamp(40px, 5vw, 64px) 0;
+}
+
+.footer-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.footer-mark {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--violet);
+  background: rgba(139, 124, 255, 0.1);
+}
+
+.footer-mark svg {
+  width: 15px;
+  height: 15px;
+}
+
+.footer-tag {
+  margin-top: 16px;
+  max-width: 34ch;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.footer-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.footer-badges span {
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--chip);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  font-size: 13px;
+}
+
+.footer-heading {
+  margin-bottom: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.footer-col a {
+  color: var(--muted);
+  transition: color 250ms ease;
+}
+
+.footer-col a:hover {
+  color: #fff;
+}
+
+.footer-product {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.footer-product strong {
+  font-weight: 600;
+}
+
+.footer-product small {
+  font-size: 11.5px;
+  color: var(--faint);
+}
+
+.footer-phone {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.footer-phone--primary {
+  color: var(--violet) !important;
+}
+
+.footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.footer-actions a {
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--chip);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: background 250ms ease, color 250ms ease, border-color 250ms ease;
+}
+
+.footer-actions a:hover {
+  background: var(--violet);
+  border-color: var(--violet);
+  color: #fff !important;
+}
+
+.footer-address,
+.footer-team {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.footer-team {
+  margin-top: 8px;
+  font-size: 11.5px;
+  color: var(--faint);
+}
+
+.footer-maplink {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.footer-maplink svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* ───────────── Mega wordmark ───────────── */
+.footer-mega {
+  font-family: var(--font-display);
+  font-size: clamp(60px, 19vw, 300px);
+  font-weight: 800;
+  line-height: 0.82;
+  letter-spacing: -0.045em;
+  text-align: center;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.12);
+  user-select: none;
+  pointer-events: none;
+}
+
+.footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 24px 0 28px;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--faint);
+}
+
+.footer-top {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--muted);
+  transition: background 280ms ease, color 280ms ease, border-color 280ms ease;
+}
+
+.footer-top:hover {
+  background: var(--violet);
+  border-color: var(--violet);
+  color: #fff;
+}
+
+.footer-top svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* ───────────── Responsive ───────────── */
+@media (max-width: 1000px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 36px 28px;
+  }
+  .footer-brand {
+    grid-column: 1 / -1;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--line);
+  }
+}
+
+@media (max-width: 760px) {
+  .footer-cta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 22px;
+  }
+  .footer-cta-title {
+    max-width: 16ch;
+  }
+  .footer-cta-side {
+    align-items: flex-start;
+  }
+  .footer-cta-phone {
+    font-size: min(7.4vw, 30px);
+  }
+  .footer-grid {
+    gap: 30px 20px;
+    padding: 36px 0 28px;
+  }
+  .footer-tag {
+    font-size: 12px;
+  }
+  .footer-product small {
+    display: none;
+  }
+  .footer-col {
+    font-size: 12px;
+  }
+  .footer-name {
+    font-size: 13px;
+    letter-spacing: 0.1em;
+  }
+  /* Full-column-width pills: equal, aligned and a proper touch height. */
+  .footer-actions {
+    gap: 8px;
+  }
+  .footer-actions a {
+    flex: 1 1 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 14px;
+  }
+  .footer-made {
+    display: none;
+  }
+  .footer-bottom {
+    flex-wrap: nowrap;
+  }
+}

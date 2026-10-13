@@ -1,0 +1,107 @@
+.user-cursor {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  mix-blend-mode: normal;
+}
+
+.user-cursor-dot,
+.user-cursor-tag {
+  position: fixed;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+
+.user-cursor-core {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  mix-blend-mode: difference;
+  transition: transform 250ms var(--ease-out), opacity 250ms ease;
+}
+
+.user-cursor-ring {
+  position: absolute;
+  top: -18px;
+  left: -18px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  mix-blend-mode: difference;
+  transform: scale(0.2);
+  opacity: 0;
+  transition: transform 300ms var(--ease-out), opacity 300ms ease;
+}
+
+.user-cursor-tag {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  transition: opacity 250ms ease;
+}
+
+.user-cursor-pointer {
+  width: 18px;
+  height: 18px;
+  color: var(--violet);
+  margin-left: 6px;
+  margin-top: 6px;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+  transition: transform 300ms var(--ease-out), opacity 250ms ease;
+}
+
+.user-cursor-label {
+  margin-top: 20px;
+  margin-left: -2px;
+  padding: 5px 10px 5px 9px;
+  border-radius: 999px 999px 999px 4px;
+  background: var(--violet);
+  color: #050505;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  transition: transform 300ms var(--ease-out), background 250ms ease, color 250ms ease;
+}
+
+.user-cursor--hidden .user-cursor-dot,
+.user-cursor--hidden .user-cursor-tag {
+  opacity: 0;
+}
+
+.user-cursor--hover .user-cursor-ring {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.user-cursor--hover .user-cursor-core {
+  transform: scale(0.5);
+}
+
+.user-cursor--hover .user-cursor-label {
+  background: #fff;
+  transform: translateY(-2px);
+}
+
+.user-cursor--hover .user-cursor-pointer {
+  transform: rotate(-12deg);
+}
+
+.user-cursor--down .user-cursor-core {
+  transform: scale(1.8);
+}
+
+.user-cursor--down .user-cursor-label {
+  transform: scale(0.94);
+}

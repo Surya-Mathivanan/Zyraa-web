@@ -1,0 +1,159 @@
+/* ───────────── Signal Type: neon-sign headline ─────────────
+   Two nested spans per letter on purpose:
+   .st-char       → idle buzz, animates opacity only
+   .st-char-inner → ignite, animates colour / stroke / glow
+   Splitting them keeps the infinite buzz from overwriting the
+   ignite's final state, since both would otherwise target
+   text-shadow and colour.                                     */
+
+.st {
+  --st-lit: #ffffff;
+  --st-glow: var(--violet);
+  --st-unlit: rgba(255, 255, 255, 0.2);
+  --st-stroke: 1.4px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  width: 100%;
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.st-char {
+  display: inline-block;
+  will-change: opacity;
+}
+
+.st-space {
+  display: inline-block;
+  width: 0.28em;
+}
+
+/* RESTING STATE = LIT. Everything that could go wrong (reduced motion, a missed
+   IntersectionObserver, no JS, a prerender) lands here, so the headline is
+   never invisible: white core, tight white halo, wide coloured bloom. */
+.st-char-inner {
+  display: inline-block;
+  color: var(--st-lit);
+  -webkit-text-stroke: var(--st-stroke) var(--st-lit);
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.75), 0 0 22px rgba(139, 124, 255, 0.45),
+    0 0 58px rgba(139, 124, 255, 0.28);
+}
+
+/* Armed: we have committed to animating, so drop to the unlit outline and wait
+   for the trigger. Applied on the first render, so there is no lit flash. */
+.st--arm .st-char-inner {
+  color: transparent;
+  -webkit-text-stroke-color: var(--st-unlit);
+  text-shadow: none;
+}
+
+/* Triggered: run the flicker, ending on the lit keyframe. */
+.st--arm.st--lit .st-char-inner {
+  animation: st-ignite var(--st-dur, 1.15s) var(--st-delay, 0s) forwards;
+}
+
+/* Safety net fired: the observer never reported, so just be lit. */
+.st--arm.st--force-lit .st-char-inner {
+  color: var(--st-lit);
+  -webkit-text-stroke-color: var(--st-lit);
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.75), 0 0 22px rgba(139, 124, 255, 0.45),
+    0 0 58px rgba(139, 124, 255, 0.28);
+}
+
+@keyframes st-ignite {
+  0%,
+  6% {
+    color: transparent;
+    -webkit-text-stroke-color: var(--st-unlit);
+    text-shadow: none;
+  }
+  /* first strike: dim, barely holds */
+  7%,
+  11% {
+    color: rgba(255, 255, 255, 0.55);
+    -webkit-text-stroke-color: rgba(255, 255, 255, 0.5);
+    text-shadow: 0 0 4px rgba(255, 255, 255, 0.35);
+  }
+  12%,
+  19% {
+    color: transparent;
+    -webkit-text-stroke-color: var(--st-unlit);
+    text-shadow: none;
+  }
+  /* second strike: nearly there, then drops out */
+  20%,
+  31% {
+    color: var(--st-lit);
+    -webkit-text-stroke-color: var(--st-lit);
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.7), 0 0 20px rgba(139, 124, 255, 0.4);
+  }
+  32%,
+  38% {
+    color: rgba(255, 255, 255, 0.12);
+    -webkit-text-stroke-color: rgba(255, 255, 255, 0.3);
+    text-shadow: none;
+  }
+  /* catches and holds */
+  46% {
+    color: var(--st-lit);
+    -webkit-text-stroke-color: var(--st-lit);
+    text-shadow: 0 0 7px rgba(255, 255, 255, 0.8), 0 0 26px rgba(139, 124, 255, 0.5),
+      0 0 64px rgba(139, 124, 255, 0.3);
+  }
+  58% {
+    color: var(--st-lit);
+    -webkit-text-stroke-color: var(--st-lit);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.6), 0 0 16px rgba(139, 124, 255, 0.32),
+      0 0 44px rgba(139, 124, 255, 0.2);
+  }
+  100% {
+    color: var(--st-lit);
+    -webkit-text-stroke-color: var(--st-lit);
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.75), 0 0 22px rgba(139, 124, 255, 0.45),
+      0 0 58px rgba(139, 124, 255, 0.28);
+  }
+}
+
+/* Idle buzz: only while lit AND on screen, so it costs nothing once the hero
+   is scrolled past. Opacity only — see the note at the top of this file. */
+.st--lit.st--onscreen .st-char--buzz,
+.st--force-lit.st--onscreen .st-char--buzz {
+  animation: st-buzz 7.5s var(--st-buzz-delay, 0s) infinite;
+}
+
+@keyframes st-buzz {
+  0%,
+  88%,
+  100% {
+    opacity: 1;
+  }
+  89% {
+    opacity: 0.72;
+  }
+  90% {
+    opacity: 1;
+  }
+  93% {
+    opacity: 0.84;
+  }
+  94.5% {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 760px) {
+  .st {
+    letter-spacing: 0.1em;
+  }
+
+  .st {
+    --st-stroke: 1px;
+  }
+}
