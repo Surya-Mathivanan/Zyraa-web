@@ -10,6 +10,7 @@ import StitchLine from "../components/StitchLine.jsx";
 import { Reveal, SplitWords } from "../components/Reveal.jsx";
 import { site } from "../data/site.js";
 import { useParallax } from "../hooks/useParallax.js";
+import { useMedia } from "../hooks/useMedia.js";
 import "./about.css";
 
 function AboutHero() {
@@ -20,6 +21,9 @@ function AboutHero() {
   const y = useParallax(ref, ["0%", "30%"], {
     offset: ["start start", "end start"],
   });
+  // On phones the emblem sits in the column above the heading, so it only
+  // turns; drifting down would carry it onto the text.
+  const inColumn = useMedia("(max-width: 760px)");
   return (
     <Section tone="sand" className="ab-hero">
       <div ref={ref} className="ab-hero-inner container">
@@ -29,7 +33,7 @@ function AboutHero() {
           alt=""
           width="512"
           height="512"
-          style={{ rotate, y }}
+          style={{ rotate, y: inColumn ? 0 : y }}
           aria-hidden="true"
         />
         <Reveal>

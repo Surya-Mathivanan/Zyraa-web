@@ -43,17 +43,34 @@ src/
     posts/<slug>.js       one article body per file, loaded on demand
   lib/
     brandFonts.js         loads licensed brand fonts dropped into src/assets/fonts/
+    boot.js               lifts the first-paint loader once the first page has rendered
     rules/                the product's rules as pure functions (used by the demos):
                           arrival.js (staff timeline + late pool), production.js (shift
                           ladder), payroll.js (staff payslip), requests.js (pipelines +
                           request window), time.js
   demos/                  ten interactive demos, one chunk each, + registry.js + kit
-  components/             Nav, Footer, Section (tones), Btn, Reveal/SplitWords, ScrollText,
+  components/             Nav, Footer, Section (tones), Btn, Loader, Reveal/SplitWords, ScrollText,
                           StitchLine, Marquee, CountUp, FadingStars, SignalType,
                           ShatterType, UserCursor, mockups/ (phone + browser screens)
   pages/                  Home, Features, Apps, Demos, Demo, About, Blogs, BlogPost,
                           Contact, NotFound - each with its own stylesheet
 ```
+
+## Loading
+
+One loader covers every wait: a needle sews the Z inside a stitched hoop, then the thread
+runs through the letters of ZYRAA. Its CSS is inline in `index.html`, so it needs nothing
+from the network:
+
+- **First load / refresh** - `#boot` in `index.html` paints before any JavaScript arrives and
+  is lifted (`src/lib/boot.js`) once the first page has rendered.
+- **Changing page** - the route `Suspense` fallback in `App.jsx` (`<Loader />`), shown only if
+  the page chunk takes longer than a quarter second.
+- **Inside a page** - `<Loader variant="inline" label="…" />` for a demo, an article body and
+  the Contact map.
+
+The other routes are fetched in the background only after the first page is up, so on a slow
+connection they never compete with the page being waited on.
 
 ## CSS architecture
 
@@ -87,7 +104,7 @@ is written to `<html data-tone>`, and because the tone variables are registered 
 `@property`, the whole page cross-fades to it - that is the smooth section-to-section colour
 change. `.tone-x` pins a tone on a single element (cards, mockups). Each page has its own
 sequence: Home night → cream → indigo → ink → butter → sage → mist → sand; Features ink plus a
-tone per pillar; About sand/cream/rust; Journal cream; Contact indigo/night/sage; 404 crimson.
+tone per pillar; About sand/cream/rust; Journal cream; Contact cobalt → butter → night → sage; 404 crimson.
 
 ## Typography
 

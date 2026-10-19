@@ -73,10 +73,506 @@
          display faces (see src/styles/tokens.css and src/assets/fonts/). -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Loaded without blocking the first paint, so the loader below shows at
+         once on a slow connection; the faces swap in when they arrive. -->
     <link
       href="https://fonts.googleapis.com/css2?family=Anton&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Fraunces:ital,opsz,wght@1,9..144,600..900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Anton&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Fraunces:ital,opsz,wght@1,9..144,600..900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+
+    <!-- ── Zyraa loader ─────────────────────────────────────────────────────
+         Shared by #boot below (first paint, before any JS) and by
+         src/components/Loader.jsx (pages, demos, articles, the map). It is
+         inline so it needs nothing from the network to appear. Colours come
+         from the tone variables, with the night tone as the fallback. -->
+    <style>
+      html {
+        background: #0e0929;
+      }
+
+      #boot {
+        --bg: #0e0929;
+        --fg: #ebf1f5;
+        --fg-3: rgba(235, 241, 245, 0.52);
+        --accent: #f3f298;
+        --accent-2: #92acff;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: grid;
+        background: var(--bg);
+        clip-path: inset(0 0 0 0);
+        transition: clip-path 0.9s cubic-bezier(0.76, 0, 0.24, 1) 0.12s;
+      }
+
+      /* Lifted like the page curtain: wipes up and off the first page. */
+      #boot.is-done {
+        clip-path: inset(0 0 100% 0);
+        pointer-events: none;
+      }
+
+      .boot-stage {
+        transition:
+          opacity 0.35s ease,
+          transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
+      }
+
+      #boot.is-done .boot-stage {
+        opacity: 0;
+        transform: translateY(-32px);
+      }
+
+      .zl {
+        --zl-dur: 3.6s;
+        --zl-ink: var(--accent, #f3f298);
+        --zl-ring: var(--accent-2, #92acff);
+        --zl-glow: color-mix(in srgb, var(--zl-ink) 60%, transparent);
+        display: grid;
+        justify-items: center;
+        align-content: center;
+        gap: 22px;
+        color: var(--fg, #ebf1f5);
+        text-align: center;
+      }
+
+      .zl--page {
+        min-height: 100vh;
+        min-height: 100svh;
+        padding: 110px 24px 72px;
+        background: radial-gradient(
+          46% 40% at 50% 44%,
+          color-mix(in srgb, var(--zl-ring) 14%, transparent),
+          transparent 72%
+        );
+      }
+
+      .zl--inline {
+        --zl-dur: 2.6s;
+        gap: 14px;
+        min-height: 240px;
+        padding: 56px 20px;
+      }
+
+      /* Quick loads never see it: it only fades in after a quarter second. */
+      .zl--delay {
+        animation: zl-in 0.45s ease 0.25s both;
+      }
+
+      .zl-sr {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+      }
+
+      .zl svg {
+        display: block;
+        width: 100%;
+        height: auto;
+        overflow: visible;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .zl-mark {
+        width: clamp(88px, 22vw, 116px);
+      }
+
+      .zl--inline .zl-mark {
+        width: 76px;
+      }
+
+      .zl-word {
+        width: clamp(190px, 54vw, 290px);
+      }
+
+      .zl-face {
+        fill: color-mix(in srgb, var(--fg) 5%, transparent);
+        stroke: color-mix(in srgb, var(--fg) 12%, transparent);
+      }
+
+      /* The hoop: a stitched edge turning slowly, with a bright arc racing
+         round it. */
+      .zl-hoop {
+        stroke: color-mix(in srgb, var(--fg) 30%, transparent);
+        stroke-width: 1.5;
+        stroke-dasharray: 3 5;
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: zl-spin 26s linear infinite reverse;
+      }
+
+      .zl-orbit {
+        stroke: var(--zl-ring);
+        stroke-width: 3;
+        stroke-dasharray: 46 300;
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: zl-spin 1.3s linear infinite;
+      }
+
+      /* Stitch holes the thread is sewn along. */
+      .zl-guide {
+        stroke: color-mix(in srgb, var(--fg) 30%, transparent);
+        stroke-width: 2.5;
+        stroke-dasharray: 2.5 5;
+      }
+
+      .zl-thread {
+        stroke: var(--zl-ink);
+        stroke-width: 7;
+        stroke-dasharray: 100 200;
+        stroke-dashoffset: 100;
+        animation: var(--zl-dur) linear infinite;
+      }
+
+      /* The needle: a zero-length dash with round caps is a dot, and moving
+         the dash offset slides it along the Z in step with the thread. */
+      .zl-needle {
+        stroke: var(--fg);
+        stroke-width: 12;
+        stroke-dasharray: 0.01 200;
+        animation: zl-needle var(--zl-dur) linear infinite;
+      }
+
+      .zl-sewn {
+        animation: zl-sewn var(--zl-dur) linear infinite;
+      }
+
+      .zl-mark .zl-thread {
+        animation-name: zl-z;
+      }
+
+      .zl-l0 {
+        animation-name: zl-l0;
+      }
+      .zl-l1 {
+        animation-name: zl-l1;
+      }
+      .zl-l2 {
+        animation-name: zl-l2;
+      }
+      .zl-l3 {
+        animation-name: zl-l3;
+      }
+      .zl-l4 {
+        animation-name: zl-l4;
+      }
+
+      .zl-caption,
+      .zl-label {
+        margin: 0;
+        font:
+          500 11px/1.5 var(--font-mono, "JetBrains Mono"),
+          ui-monospace,
+          Menlo,
+          Consolas,
+          monospace;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--fg-3, rgba(235, 241, 245, 0.52));
+      }
+
+      /* Three captions taking turns in the same spot. */
+      .zl-caption {
+        display: grid;
+      }
+
+      .zl-caption span {
+        grid-area: 1 / 1;
+        animation: zl-cap 7.5s ease infinite both;
+      }
+
+      .zl-caption span:nth-child(2) {
+        animation-delay: 2.5s;
+      }
+
+      .zl-caption span:nth-child(3) {
+        animation-delay: 5s;
+      }
+
+      .zl-label::after {
+        content: "...";
+        display: inline-block;
+        width: 0;
+        overflow: hidden;
+        vertical-align: bottom;
+        animation: zl-dots 1.4s steps(4) infinite;
+      }
+
+      .zl-bar {
+        position: relative;
+        width: min(240px, 62vw);
+        height: 3px;
+        overflow: hidden;
+        border-radius: 3px;
+        background: repeating-linear-gradient(
+          90deg,
+          color-mix(in srgb, var(--fg) 24%, transparent) 0 6px,
+          transparent 6px 11px
+        );
+      }
+
+      .zl-bar span {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 34%;
+        border-radius: inherit;
+        background: var(--zl-ink);
+        box-shadow: 0 0 10px var(--zl-glow);
+        animation: zl-bar 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+      }
+
+      @keyframes zl-in {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      @keyframes zl-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* One loop: sew the Z (0–28%), run through the letters (30–70%),
+         glow (78%), unpick (86–94%). */
+      @keyframes zl-sewn {
+        0% {
+          opacity: 0;
+          filter: drop-shadow(0 0 3px var(--zl-glow));
+        }
+        3%,
+        72% {
+          opacity: 1;
+          filter: drop-shadow(0 0 3px var(--zl-glow));
+        }
+        78% {
+          opacity: 1;
+          filter: drop-shadow(0 0 12px var(--zl-glow));
+        }
+        86% {
+          opacity: 1;
+          filter: drop-shadow(0 0 3px var(--zl-glow));
+        }
+        94%,
+        100% {
+          opacity: 0;
+          filter: drop-shadow(0 0 3px var(--zl-glow));
+        }
+      }
+
+      @keyframes zl-z {
+        0% {
+          stroke-dashoffset: 100;
+          animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
+        }
+        28%,
+        100% {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      @keyframes zl-needle {
+        0% {
+          opacity: 1;
+          stroke-dashoffset: 0;
+          animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
+        }
+        28% {
+          opacity: 1;
+          stroke-dashoffset: -99.9;
+        }
+        34%,
+        100% {
+          opacity: 0;
+          stroke-dashoffset: -99.9;
+        }
+      }
+
+      /* Each letter stays hidden until its turn: a round cap would otherwise
+         show as a dot where the thread has not reached yet. */
+      @keyframes zl-l0 {
+        0%,
+        30% {
+          opacity: 0;
+          stroke-dashoffset: 100;
+          animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
+        }
+        31% {
+          opacity: 1;
+        }
+        40%,
+        100% {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      @keyframes zl-l1 {
+        0%,
+        37% {
+          opacity: 0;
+          stroke-dashoffset: 100;
+          animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
+        }
+        38% {
+          opacity: 1;
+        }
+        47%,
+        100% {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      @keyframes zl-l2 {
+        0%,
+        44% {
+          opacity: 0;
+          stroke-dashoffset: 100;
+          animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
+        }
+        45% {
+          opacity: 1;
+        }
+        56%,
+        100% {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      @keyframes zl-l3 {
+        0%,
+        53% {
+          opacity: 0;
+          stroke-dashoffset: 100;
+          animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
+        }
+        54% {
+          opacity: 1;
+        }
+        63%,
+        100% {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      @keyframes zl-l4 {
+        0%,
+        60% {
+          opacity: 0;
+          stroke-dashoffset: 100;
+          animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
+        }
+        61% {
+          opacity: 1;
+        }
+        70%,
+        100% {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      @keyframes zl-cap {
+        0% {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        6%,
+        28% {
+          opacity: 1;
+          transform: none;
+        }
+        33.3%,
+        100% {
+          opacity: 0;
+          transform: translateY(-8px);
+        }
+      }
+
+      @keyframes zl-dots {
+        to {
+          width: 4ch;
+        }
+      }
+
+      @keyframes zl-bar {
+        from {
+          transform: translateX(-105%);
+        }
+        to {
+          transform: translateX(300%);
+        }
+      }
+
+      @keyframes zl-breathe {
+        50% {
+          opacity: 0.45;
+        }
+      }
+
+      /* Reduced motion: the Z and the name sit fully sewn and the loader
+         only breathes; one caption stays put. */
+      @media (prefers-reduced-motion: reduce) {
+        .zl *,
+        .zl *::after {
+          animation: none !important;
+        }
+
+        .zl .zl-thread {
+          stroke-dashoffset: 0;
+        }
+
+        .zl .zl-needle {
+          display: none;
+        }
+
+        .zl .zl-caption span + span {
+          display: none;
+        }
+
+        .zl .zl-label::after {
+          width: auto;
+        }
+
+        .zl .zl-mark,
+        .zl .zl-word,
+        .zl .zl-bar span {
+          animation: zl-breathe 2.4s ease-in-out infinite !important;
+        }
+
+        .zl-bar span {
+          width: 100%;
+        }
+
+        #boot,
+        .boot-stage {
+          transition-duration: 0.3s;
+        }
+      }
+    </style>
+    <noscript>
+      <style>
+        #boot {
+          display: none;
+        }
+      </style>
+    </noscript>
 
     <script type="application/ld+json">
       {
@@ -97,7 +593,7 @@
           "Configurable approval pipelines for a dozen request types",
           "Geo-fenced punch and photo-verified on-duty sessions",
           "Gate outpass and tea-break QR registers",
-          "Staff payroll from Draft to Finalized to Paid, with PF and ESI",
+          "Staff payroll: generate, review issues, mark paid, with PF and ESI",
           "140+ reports with Excel and PDF export",
           "MD portal with a read-only AI assistant"
         ],
@@ -124,6 +620,51 @@
     </script>
   </head>
   <body>
+    <!-- First-paint loader: shows until the first page has rendered, then
+         src/lib/boot.js lifts it. Same markup as src/components/Loader.jsx. -->
+    <div id="boot">
+      <div class="boot-stage zl zl--page zl--delay" role="status">
+        <span class="zl-sr">Loading Zyraa</span>
+        <div class="zl-mark" aria-hidden="true">
+          <svg viewBox="0 0 120 120">
+            <circle class="zl-face" cx="60" cy="60" r="46" />
+            <circle class="zl-hoop" cx="60" cy="60" r="54" />
+            <circle class="zl-orbit" cx="60" cy="60" r="54" />
+            <path class="zl-guide" d="M38 40H82L38 80H82" />
+            <g class="zl-sewn">
+              <path class="zl-thread" d="M38 40H82L38 80H82" pathLength="100" />
+              <path class="zl-needle" d="M38 40H82L38 80H82" pathLength="100" />
+            </g>
+          </svg>
+        </div>
+        <div class="zl-word" aria-hidden="true">
+          <svg viewBox="-6 -6 252 68">
+            <path class="zl-guide" d="M4 4H36L4 52H36" />
+            <path class="zl-guide" d="M54 4L70 26L86 4M70 26V52" />
+            <path class="zl-guide" d="M106 52V4H124A12 12 0 0 1 124 28H106M120 28L136 52" />
+            <path class="zl-guide" d="M154 52L170 4L186 52M159.5 36H180.5" />
+            <path class="zl-guide" d="M204 52L220 4L236 52M209.5 36H230.5" />
+            <g class="zl-sewn">
+              <path class="zl-thread zl-l0" d="M4 4H36L4 52H36" pathLength="100" />
+              <path class="zl-thread zl-l1" d="M54 4L70 26L86 4" pathLength="100" />
+              <path class="zl-thread zl-l1" d="M70 26V52" pathLength="100" />
+              <path class="zl-thread zl-l2" d="M106 52V4H124A12 12 0 0 1 124 28H106" pathLength="100" />
+              <path class="zl-thread zl-l2" d="M120 28L136 52" pathLength="100" />
+              <path class="zl-thread zl-l3" d="M154 52L170 4L186 52" pathLength="100" />
+              <path class="zl-thread zl-l3" d="M159.5 36H180.5" pathLength="100" />
+              <path class="zl-thread zl-l4" d="M204 52L220 4L236 52" pathLength="100" />
+              <path class="zl-thread zl-l4" d="M209.5 36H230.5" pathLength="100" />
+            </g>
+          </svg>
+        </div>
+        <p class="zl-caption" aria-hidden="true">
+          <span>Syncing the face terminals</span>
+          <span>Counting shifts earned</span>
+          <span>Lining up approvals</span>
+        </p>
+        <div class="zl-bar" aria-hidden="true"><span></span></div>
+      </div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

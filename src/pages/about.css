@@ -210,6 +210,21 @@
   gap: 20px;
 }
 
+/* Phones: the emblem joins the column above the kicker, lined up with the
+   text, instead of floating faded in the corner under the header. */
+@media (max-width: 760px) {
+  .ab-hero-emblem {
+    position: relative;
+    top: auto;
+    right: auto;
+    align-self: flex-start;
+    width: clamp(150px, 44vw, 210px);
+    margin-bottom: 2px;
+    opacity: 1;
+    filter: drop-shadow(0 18px 36px rgba(160, 67, 10, 0.3));
+  }
+}
+
 @media (max-width: 1000px) {
   .ab-story-grid,
   .ab-maker-grid {
@@ -239,8 +254,4 @@
     padding-left: 40px;
   }
 
-  .ab-hero-emblem {
-    width: 180px;
-    opacity: 0.5;
-  }
 }

@@ -5,6 +5,7 @@ import Section from "../components/Section.jsx";
 import Footer from "../components/Footer.jsx";
 import Seo from "../components/Seo.jsx";
 import Btn from "../components/Btn.jsx";
+import Loader from "../components/Loader.jsx";
 import { Reveal } from "../components/Reveal.jsx";
 import { posts } from "../data/posts/index.js";
 import { formatDate } from "../lib/date.js";
@@ -150,7 +151,7 @@ export default function BlogPost() {
 
       <Section tone={post.tone} as="article" className="ps-body">
         <div className="container ps-narrow">
-          {!blocks && <p className="dm-loading">Loading the article…</p>}
+          {!blocks && <Loader variant="inline" label="Loading the article" />}
           {blocks?.map((b, k) => (
             <Block key={k} b={b} />
           ))}

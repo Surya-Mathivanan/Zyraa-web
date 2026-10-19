@@ -319,12 +319,6 @@
   color: var(--fg-3);
 }
 
-.dm-loading {
-  padding: 80px 0;
-  font-family: var(--font-mono);
-  color: var(--fg-3);
-}
-
 /* Inputs */
 .dm-input {
   width: 100%;

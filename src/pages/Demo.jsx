@@ -4,6 +4,7 @@ import Section from "../components/Section.jsx";
 import Footer from "../components/Footer.jsx";
 import Seo from "../components/Seo.jsx";
 import Btn from "../components/Btn.jsx";
+import Loader from "../components/Loader.jsx";
 import { Reveal, SplitWords } from "../components/Reveal.jsx";
 import { ArrowRight } from "../components/Icons.jsx";
 import { demos, demoBySlug } from "../demos/registry.js";
@@ -58,9 +59,7 @@ export default function Demo() {
 
       <Section tone={demo.tone} className="demo-lab-sec">
         <div className="container">
-          <Suspense
-            fallback={<div className="dm-loading">Loading the demo…</div>}
-          >
+          <Suspense fallback={<Loader variant="inline" label="Loading the demo" />}>
             <Lab />
           </Suspense>
         </div>

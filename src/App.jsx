@@ -3,7 +3,9 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import Nav from "./components/Nav.jsx";
 import UserCursor from "./components/UserCursor.jsx";
+import Loader from "./components/Loader.jsx";
 import { useLenis, scrollToTop, scrollToSelector } from "./hooks/useLenis.js";
+import { liftBootLoader } from "./lib/boot.js";
 
 // One chunk per route. The loaders are kept so every route can be fetched in
 // the background once the first page is up, which keeps later navigations
@@ -32,16 +34,25 @@ const BlogPost = lazy(loaders.blogPost);
 const Contact = lazy(loaders.contact);
 const NotFound = lazy(loaders.notFound);
 
-function usePreloadRoutes() {
+// Fetched only after the first page is up, so on a slow connection the
+// other routes never compete with the page being waited on.
+let preloadStarted = false;
+function preloadRoutes() {
+  if (preloadStarted) return;
+  preloadStarted = true;
+  const preload = () => Object.values(loaders).forEach((load) => load().catch(() => {}));
+  if ("requestIdleCallback" in window) window.requestIdleCallback(preload, { timeout: 3000 });
+  else setTimeout(preload, 1500);
+}
+
+/** Sits beside the routes inside Suspense, so its effect runs only once the
+    page itself, not the loader, has rendered. */
+function PageReady() {
   useEffect(() => {
-    const preload = () => Object.values(loaders).forEach((load) => load().catch(() => {}));
-    if ("requestIdleCallback" in window) {
-      const id = window.requestIdleCallback(preload, { timeout: 3000 });
-      return () => window.cancelIdleCallback(id);
-    }
-    const id = setTimeout(preload, 1500);
-    return () => clearTimeout(id);
+    liftBootLoader();
+    preloadRoutes();
   }, []);
+  return null;
 }
 
 function ScrollManager() {
@@ -83,7 +94,6 @@ const curtainVariants = {
 
 export default function App() {
   useLenis();
-  usePreloadRoutes();
   const location = useLocation();
 
   return (
@@ -105,9 +115,11 @@ export default function App() {
               pointerEvents: "none",
             }}
           />
-          {/* Holds the page height while a route chunk loads, so the layout does
-              not collapse to nothing under the curtain. */}
-          <Suspense fallback={<div style={{ minHeight: "100vh" }} />}>
+          {/* While a route chunk is still on its way (a slow connection, or a
+              click before the background preload got to it) the loader holds
+              the page; it only appears if the wait passes a quarter second. */}
+          <Suspense fallback={<Loader />}>
+            <PageReady />
             <Routes location={location}>
               <Route path="/" element={<Home />} />
               <Route path="/features" element={<Features />} />
