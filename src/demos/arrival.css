@@ -1,0 +1,134 @@
+.at-track {
+  position: relative;
+  height: 74px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--bg) 80%, black);
+  overflow: hidden;
+}
+
+.at-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 8px;
+  opacity: 0.38;
+  transition: opacity 300ms ease;
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.at-zone em {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-style: normal;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.at-zone.is-on {
+  opacity: 1;
+}
+
+.at-zone--on-time { background: #2f9e64; }
+.at-zone--late { background: #c98a12; }
+.at-zone--permission { background: #4f6fd6; }
+.at-zone--extra { background: #a0430a; }
+.at-zone--missed { background: #b40023; }
+
+.at-needle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  margin-left: -1.5px;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.18);
+}
+
+.at-needle i {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: #fff;
+  color: #0e0929;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-style: normal;
+  white-space: nowrap;
+}
+
+.at-scale {
+  position: relative;
+  height: 18px;
+  margin-top: -8px;
+}
+
+.at-scale span {
+  position: absolute;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--fg-3);
+  white-space: nowrap;
+}
+
+.at-reason {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.at-pool {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.at-pips {
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  gap: 6px;
+}
+
+.at-pip {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  border: 1.5px dashed var(--line);
+  transition: background 300ms ease, transform 400ms var(--ease-out);
+}
+
+.at-pip.is-free {
+  border-style: solid;
+  border-color: #2f9e64;
+  background: rgba(47, 158, 100, 0.3);
+}
+
+.at-pip.is-billable {
+  border-style: solid;
+  border-color: #c98a12;
+  background: rgba(201, 138, 18, 0.45);
+}
+
+.at-pip.is-slab.is-billable::after {
+  content: "¼";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.at-pip.is-new {
+  transform: scale(1.18);
+  box-shadow: 0 0 0 3px var(--accent);
+}

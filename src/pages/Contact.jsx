@@ -1,69 +1,30 @@
 import { useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import FadingStars from "../components/FadingStars.jsx";
+import Section from "../components/Section.jsx";
 import Footer from "../components/Footer.jsx";
 import Seo from "../components/Seo.jsx";
 import { Reveal, SplitWords } from "../components/Reveal.jsx";
+import { ArrowUpRight, Chat, Phone, Pin } from "../components/Icons.jsx";
 import { site } from "../data/site.js";
 import { scrollToSelector } from "../hooks/useLenis.js";
+import { useParallax } from "../hooks/useParallax.js";
 import "./contact.css";
 
-const mapSrc = "https://www.google.com/maps?q=Tiruppur,Tamil+Nadu,India&z=12&output=embed";
-
-function Arrow() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M6 18L18 6M8 6H18V16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function PhoneIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M6.6 3h3l1.6 4.2-2 1.3a11 11 0 0 0 6.3 6.3l1.3-2L21 14.4v3a2.6 2.6 0 0 1-2.8 2.6A16.6 16.6 0 0 1 3.9 5.8 2.6 2.6 0 0 1 6.6 3Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function ChatIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M12 3.5a8.5 8.5 0 0 0-7.3 12.9L3.5 20.5l4.3-1.1A8.5 8.5 0 1 0 12 3.5Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-      <path d="M8.5 12h.01M12 12h.01M15.5 12h.01" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function PinIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M12 21s6.5-5.6 6.5-11A6.5 6.5 0 0 0 5.5 10c0 5.4 6.5 11 6.5 11Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-      <circle cx="12" cy="10" r="2.3" stroke="currentColor" strokeWidth="1.5" />
-    </svg>
-  );
-}
+const mapSrc =
+  "https://www.google.com/maps?q=Tiruppur,Tamil+Nadu,India&z=12&output=embed";
 
 function ContactHero() {
   const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const titleY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
-  const opacity = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
+  // Only the heading block drifts; the action cards below stay put so they are
+  // never pushed into the hero's clipped bottom edge.
+  const y = useParallax(ref, ["0%", "10%"], {
+    offset: ["start start", "end start"],
+  });
+  const opacity = useParallax(ref, [1, 0], {
+    offset: ["start start", "end start"],
+    input: [0, 0.85],
+  });
 
   const actions = [
     {
@@ -73,7 +34,7 @@ function ContactHero() {
       sub: "Straight to the developer",
       href: `tel:+${site.primaryPhone.raw}`,
       cursor: "Call",
-      Icon: PhoneIcon,
+      Icon: Phone,
     },
     {
       key: "wa",
@@ -82,7 +43,7 @@ function ContactHero() {
       sub: `Message ${site.primaryPhone.label}`,
       href: `https://wa.me/${site.primaryPhone.raw}`,
       cursor: "Chat",
-      Icon: ChatIcon,
+      Icon: Chat,
       external: true,
     },
     {
@@ -92,7 +53,7 @@ function ContactHero() {
       sub: `${site.location.state}, ${site.location.country}`,
       href: "#map",
       cursor: "Map",
-      Icon: PinIcon,
+      Icon: Pin,
       onClick: (e) => {
         e.preventDefault();
         scrollToSelector("#map");
@@ -101,69 +62,73 @@ function ContactHero() {
   ];
 
   return (
-    <section className="contact-hero" ref={ref}>
-      <FadingStars count={110} speed={0.95} trail={1.15} />
-      <div className="contact-hero-glow" aria-hidden="true" />
-      <div className="grain" />
-
-      <motion.div className="container contact-hero-inner" style={{ y: titleY, opacity }}>
-        <div className="contact-hero-top">
-          <Reveal delay={0.1}>
-            <span className="kicker">Contact · {site.productName}</span>
-          </Reveal>
-          <Reveal delay={0.2} className="contact-hero-tags">
-            <span>HRMS for manufacturing</span>
-            <span>Demo on your data</span>
-            <span>{site.location.city}</span>
-          </Reveal>
-        </div>
-
-        <SplitWords as="h1" className="contact-hero-title" text="LET'S TALK" delay={0.25} stagger={0.12} />
-
-        <div className="contact-hero-row">
-          <Reveal delay={0.45}>
-            <p className="contact-hero-text">
-              Tell us how your unit runs attendance and payroll today. One number, and it reaches{" "}
-              {site.developer.name} directly.
-            </p>
-          </Reveal>
-          <Reveal delay={0.55} className="contact-hero-phones">
-            <a href={`tel:+${site.primaryPhone.raw}`} className="contact-hero-phone" data-cursor="Call">
-              {site.primaryPhone.label}
-            </a>
-          </Reveal>
-        </div>
-
-        <div className="contact-actions">
-          {actions.map((a, i) => (
-            <Reveal key={a.key} delay={0.6 + i * 0.1} y={20}>
+    <Section tone="indigo" className="ct-hero">
+      <div ref={ref} className="ct-hero-inner">
+        <FadingStars count={100} speed={0.9} trail={1.15} />
+        <div className="grain" />
+        <div className="container ct-hero-content">
+          <motion.div style={{ y, opacity }}>
+            <Reveal delay={0.05} className="ct-hero-top">
+              <span className="kicker">Contact · {site.productName}</span>
+              <span className="chip">Demo on your own data</span>
+            </Reveal>
+            <SplitWords
+              as="h1"
+              className="ct-hero-title display"
+              text="LET'S TALK"
+              stagger={0.1}
+              delay={0.15}
+            />
+            <Reveal delay={0.4} className="ct-hero-row">
+              <p className="lede">
+                Tell us how your unit runs attendance and payroll today. One
+                number, and it reaches {site.developer.name} directly.
+              </p>
               <a
-                className="contact-action"
-                href={a.href}
-                onClick={a.onClick}
-                target={a.external ? "_blank" : undefined}
-                rel={a.external ? "noreferrer noopener" : undefined}
-                data-cursor={a.cursor}
+                href={`tel:+${site.primaryPhone.raw}`}
+                className="ct-hero-phone figure"
+                data-cursor="Call"
               >
-                <span className="contact-action-icon">
-                  <a.Icon />
-                </span>
-                <span className="contact-action-label">{a.label}</span>
-                <span className="contact-action-title">{a.title}</span>
-                <span className="contact-action-sub">{a.sub}</span>
-                <span className="contact-action-arrow">
-                  <Arrow />
-                </span>
+                {site.primaryPhone.label}
               </a>
             </Reveal>
-          ))}
+          </motion.div>
+
+          <div className="ct-actions">
+            {actions.map((a, i) => (
+              <Reveal key={a.key} delay={0.5 + i * 0.08} y={20}>
+                <a
+                  className="ct-action"
+                  href={a.href}
+                  onClick={a.onClick}
+                  target={a.external ? "_blank" : undefined}
+                  rel={a.external ? "noreferrer noopener" : undefined}
+                  data-cursor={a.cursor}
+                >
+                  <span className="ct-action-icon">
+                    <a.Icon />
+                  </span>
+                  <span className="ct-action-label">{a.label}</span>
+                  <span className="ct-action-title">{a.title}</span>
+                  <span className="ct-action-sub">{a.sub}</span>
+                  <ArrowUpRight className="ct-action-arrow" />
+                </a>
+              </Reveal>
+            ))}
+          </div>
         </div>
-      </motion.div>
-    </section>
+      </div>
+    </Section>
   );
 }
 
-const initialForm = { name: "", company: "", phone: "", headcount: "", message: "" };
+const initialForm = {
+  name: "",
+  company: "",
+  phone: "",
+  headcount: "",
+  message: "",
+};
 
 function ContactForm() {
   const [form, setForm] = useState(initialForm);
@@ -187,29 +152,49 @@ function ContactForm() {
       "",
       form.message,
     ].filter((l) => l !== null);
-    const url = `https://wa.me/${site.primaryPhone.raw}?text=${encodeURIComponent(lines.join("\n"))}`;
-    window.open(url, "_blank", "noopener");
+    window.open(
+      `https://wa.me/${site.primaryPhone.raw}?text=${encodeURIComponent(lines.join("\n"))}`,
+      "_blank",
+      "noopener",
+    );
     setSent(true);
   };
 
   return (
-    <form className="contact-form" onSubmit={onSubmit}>
-      <div className="contact-form-row">
-        <label className="field">
+    <form className="ct-form" onSubmit={onSubmit}>
+      <div className="ct-form-row">
+        <label className="ct-field">
           <span>Your name</span>
-          <input required value={form.name} onChange={update("name")} placeholder="Name" autoComplete="name" />
+          <input
+            required
+            value={form.name}
+            onChange={update("name")}
+            placeholder="Name"
+            autoComplete="name"
+          />
         </label>
-        <label className="field">
+        <label className="ct-field">
           <span>Company / unit</span>
-          <input value={form.company} onChange={update("company")} placeholder="Company name" autoComplete="organization" />
+          <input
+            value={form.company}
+            onChange={update("company")}
+            placeholder="Company name"
+            autoComplete="organization"
+          />
         </label>
       </div>
-      <div className="contact-form-row">
-        <label className="field">
+      <div className="ct-form-row">
+        <label className="ct-field">
           <span>Phone</span>
-          <input value={form.phone} onChange={update("phone")} placeholder="+91" inputMode="tel" autoComplete="tel" />
+          <input
+            value={form.phone}
+            onChange={update("phone")}
+            placeholder="+91"
+            inputMode="tel"
+            autoComplete="tel"
+          />
         </label>
-        <label className="field">
+        <label className="ct-field">
           <span>Headcount</span>
           <input
             value={form.headcount}
@@ -219,7 +204,7 @@ function ContactForm() {
           />
         </label>
       </div>
-      <label className="field">
+      <label className="ct-field">
         <span>How do you run attendance and payroll today?</span>
         <textarea
           required
@@ -229,13 +214,17 @@ function ContactForm() {
           placeholder="Biometric devices, shift pattern, pay cycles, what breaks at month end."
         />
       </label>
-      <button type="submit" className="pill-action contact-submit" data-cursor="Send">
-        <span className="pill">{sent ? "Opened WhatsApp" : "Send via WhatsApp"}</span>
-        <span className="pill-arrow">
-          <Arrow />
+      <button
+        type="submit"
+        className="btn btn--solid ct-submit"
+        data-cursor="Send"
+      >
+        <span>{sent ? "Opened WhatsApp" : "Send via WhatsApp"}</span>
+        <span className="btn-icon">
+          <ArrowUpRight />
         </span>
       </button>
-      <p className="contact-form-note" role="status">
+      <p className="ct-form-note" role="status">
         {sent
           ? "WhatsApp should have opened in a new tab. Edit any field to compose another message."
           : `The message opens in WhatsApp to ${site.primaryPhone.label}. Prefer a call? Use the number above.`}
@@ -245,86 +234,62 @@ function ContactForm() {
 }
 
 function ContactMain() {
+  const bring = [
+    "One month's biometric export",
+    "Your shift timings and grace",
+    "How production is paid - per shift, which cycles",
+    "The salary sheet you made by hand for that month",
+  ];
   return (
-    <section className="contact-main">
-      <div className="container contact-main-grid">
-        <div className="contact-info">
-          <Reveal>
-            <span className="kicker">Reach us</span>
-          </Reveal>
-          <Reveal delay={0.05}>
-            <h2 className="contact-info-title">One number. One developer.</h2>
-          </Reveal>
-
-          <div className="contact-block">
-            <span className="contact-block-label">Phone</span>
-            <div className="contact-phone-row">
-              <a href={`tel:+${site.primaryPhone.raw}`} className="contact-phone" data-cursor="Call">
-                {site.primaryPhone.label}
-              </a>
-              <a
-                href={`https://wa.me/${site.primaryPhone.raw}`}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="contact-wa"
-                data-cursor="WhatsApp"
-              >
-                WhatsApp
-              </a>
-            </div>
-          </div>
-
-          <div className="contact-block">
-            <span className="contact-block-label">Location</span>
-            <p className="contact-location">
-              {site.productName}
-              <br />
-              {site.location.city}, {site.location.state}
-              <br />
-              {site.location.country}
-            </p>
-          </div>
-
-          <div className="contact-block">
-            <span className="contact-block-label">What to bring</span>
-            <p className="contact-company">
-              The quickest demo uses one month you already know the answer to: your biometric export, your shift
-              pattern and your pay cycles. We run it in Zyraa and you compare the output with the sheet you
-              produced by hand.
-            </p>
-          </div>
+    <Section tone="night" className="section ct-main">
+      <div className="container ct-main-grid">
+        <div className="ct-info">
+          <span className="kicker">The quickest demo</span>
+          <SplitWords
+            as="h2"
+            className="h2"
+            text="Bring a month you already know."
+            accent="already know."
+          />
+          <p className="lede">
+            We run that month in Zyraa and you compare the output with the sheet
+            you produced by hand - every difference comes with the rule that
+            caused it.
+          </p>
+          <ol className="ct-bring">
+            {bring.map((b, i) => (
+              <Reveal as="li" key={b} delay={i * 0.06}>
+                <span className="figure">0{i + 1}</span>
+                {b}
+              </Reveal>
+            ))}
+          </ol>
         </div>
-
-        <Reveal delay={0.15} className="contact-form-wrap">
-          <div className="contact-form-card">
-            <div className="contact-form-head">
-              <span className="kicker">Message</span>
-              <h3>Book a demo</h3>
-            </div>
-            <ContactForm />
-          </div>
+        <Reveal delay={0.1} className="ct-form-card">
+          <span className="kicker">Message</span>
+          <h3 className="h3">Book a demo</h3>
+          <ContactForm />
         </Reveal>
       </div>
-    </section>
+    </Section>
   );
 }
 
 function MapSection() {
   return (
-    <section className="contact-map" id="map">
-      <div className="container contact-map-head">
-        <Reveal>
-          <span className="kicker">Find us</span>
-        </Reveal>
-        <SplitWords as="h2" className="contact-map-title" text="TIRUPPUR" delay={0.05} />
-        <Reveal delay={0.2}>
-          <p className="contact-map-text">
-            Built in the knitwear capital of India, close to the floors it was written for.
+    <Section tone="sage" className="section ct-map" id="map">
+      <div className="container ct-map-head">
+        <span className="kicker">Find us</span>
+        <SplitWords as="h2" className="ct-map-title display" text="TIRUPPUR" />
+        <Reveal delay={0.15}>
+          <p className="lede">
+            Built in India's knitwear capital, close to the floors it was
+            written for.
           </p>
         </Reveal>
       </div>
       <Reveal delay={0.1} className="container">
-        <div className="contact-map-frame">
+        <div className="ct-map-frame">
           <iframe
             title={`Map of ${site.location.city}`}
             src={mapSrc}
@@ -334,7 +299,7 @@ function MapSection() {
           />
         </div>
       </Reveal>
-    </section>
+    </Section>
   );
 }
 

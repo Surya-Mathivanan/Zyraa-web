@@ -1,0 +1,167 @@
+.geo {
+  display: grid;
+  gap: 18px;
+}
+
+.geo-map {
+  width: 100%;
+  height: auto;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--bg) 85%, white);
+  touch-action: none;
+  cursor: grab;
+}
+
+.geo-map.is-dragging {
+  cursor: grabbing;
+}
+
+.geo-grid-line {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.geo-road {
+  fill: none;
+  stroke: var(--card);
+  stroke-width: 18;
+  stroke-linecap: round;
+}
+
+.geo-fence {
+  fill: rgba(53, 58, 150, 0.12);
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  stroke-dasharray: 8 6;
+}
+
+.geo-branch {
+  fill: var(--fg);
+}
+
+.geo-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  fill: var(--fg-2);
+  text-anchor: middle;
+}
+
+.geo-ruler {
+  stroke: var(--fg-3);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 5;
+}
+
+.geo-me-halo {
+  fill: rgba(40, 92, 204, 0.22);
+  animation: geo-halo 2s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.geo-me-dot {
+  fill: #285ccc;
+  stroke: #fff;
+  stroke-width: 3;
+}
+
+.geo-me.is-mock .geo-me-dot {
+  fill: #b40023;
+}
+
+.geo-me.is-mock .geo-me-halo {
+  fill: rgba(180, 0, 35, 0.25);
+}
+
+@keyframes geo-halo {
+  50% {
+    transform: scale(1.35);
+    opacity: 0.5;
+  }
+}
+
+.geo-result {
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.geo-result.is-ok {
+  background: rgba(47, 158, 100, 0.22);
+}
+
+.geo-result.is-no {
+  background: rgba(180, 0, 35, 0.2);
+}
+
+.od-slots {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.od-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-height: 190px;
+  padding: 14px;
+  border: 1.5px dashed var(--line);
+  border-radius: 16px;
+  font-size: 14px;
+}
+
+.od-slot .dm-btn {
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+.od-slot .dm-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.od-slot-n {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-3);
+}
+
+.od-slot small {
+  color: var(--fg-2);
+}
+
+.od-slot.is-pending {
+  border-style: solid;
+  border-color: #d99a1f;
+}
+
+.od-slot.is-verified {
+  border-style: solid;
+  border-color: #2f9e64;
+  background: rgba(47, 158, 100, 0.12);
+}
+
+.od-slot.is-rejected,
+.od-slot.is-mock {
+  border-style: solid;
+  border-color: #b40023;
+  background: rgba(180, 0, 35, 0.1);
+}
+
+.od-photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 10px;
+  background: radial-gradient(circle at 50% 38%, var(--fg-3) 0 18%, transparent 19%),
+    radial-gradient(ellipse at 50% 100%, var(--fg-3) 0 38%, transparent 39%), var(--card);
+}
+
+@media (max-width: 700px) {
+  .od-slots {
+    grid-template-columns: 1fr 1fr;
+  }
+}

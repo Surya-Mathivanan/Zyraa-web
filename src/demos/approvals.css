@@ -1,0 +1,86 @@
+.ap {
+  display: grid;
+  gap: 18px;
+}
+
+.ap-card {
+  padding: 18px;
+  border-radius: 18px;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+
+.ap-card-top {
+  flex-wrap: nowrap;
+}
+
+.ap-card-top strong {
+  display: block;
+  font-size: 15px;
+}
+
+.ap-card-top small {
+  color: var(--fg-3);
+}
+
+.ap-avatar {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 800;
+}
+
+.ap-status {
+  margin-left: auto;
+}
+
+.ap-off {
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(180, 0, 35, 0.2);
+  font-size: 14px;
+}
+
+.ap-window-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.ap-window input[type="date"] {
+  color-scheme: light dark;
+}
+
+.ap-window-out {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-weight: 600;
+}
+
+.ap-window-out svg {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+}
+
+.ap-window-out.is-ok {
+  background: rgba(47, 158, 100, 0.22);
+}
+
+.ap-window-out.is-no {
+  background: rgba(180, 0, 35, 0.22);
+}
+
+@media (max-width: 560px) {
+  .ap-window-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -28,8 +28,15 @@ function setMeta(selector, attr, value, content) {
   return el;
 }
 
-export default function Seo({ title, description, path = "/", noindex = false }) {
-  const fullTitle = title ? `${title} — ${site.productName}` : site.defaultTitle;
+export default function Seo({
+  title,
+  description,
+  path = "/",
+  noindex = false,
+}) {
+  const fullTitle = title
+    ? `${title} - ${site.productName}`
+    : site.defaultTitle;
 
   useEffect(() => {
     document.title = fullTitle;
@@ -45,10 +52,20 @@ export default function Seo({ title, description, path = "/", noindex = false })
 
     setMeta('meta[name="description"]', "name", "description", description);
     setMeta('meta[property="og:title"]', "property", "og:title", fullTitle);
-    setMeta('meta[property="og:description"]', "property", "og:description", description);
+    setMeta(
+      'meta[property="og:description"]',
+      "property",
+      "og:description",
+      description,
+    );
     setMeta('meta[property="og:url"]', "property", "og:url", canonicalHref);
     setMeta('meta[name="twitter:title"]', "name", "twitter:title", fullTitle);
-    setMeta('meta[name="twitter:description"]', "name", "twitter:description", description);
+    setMeta(
+      'meta[name="twitter:description"]',
+      "name",
+      "twitter:description",
+      description,
+    );
 
     // Keep the 404 out of the index; every other route is indexable.
     const robots = document.head.querySelector('meta[name="robots"]');

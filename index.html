@@ -1,14 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-tone="night">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#05060a" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0e0929" />
 
-    <title>Zyraa HRMS — Attendance, Payroll and People in One System</title>
+    <title>
+      Zyraa HRMS - Attendance, Payroll and Approvals for Garment Units
+    </title>
     <meta
       name="description"
-      content="Zyraa is an HRMS for manufacturing units: biometric attendance, staff and production payroll, leave and permission approvals, geo on-duty and 140+ reports. Built in Tiruppur."
+      content="Zyraa is the HRMS built for garment and knitwear units: biometric attendance, staff and production payroll, approvals, gate passes, geo on-duty and 140+ reports, across an admin portal, an employee web app and a mobile app."
     />
     <!-- PLACEHOLDER DOMAIN. Also set in src/data/site.js (site.url) and public/sitemap.xml. -->
     <link rel="canonical" href="https://zyraa.app/" />
@@ -17,30 +22,59 @@
          homepage values are what every shared link preview uses. -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Zyraa HRMS" />
-    <meta property="og:title" content="Zyraa HRMS — Attendance, Payroll and People in One System" />
+    <meta
+      property="og:title"
+      content="Zyraa HRMS - Attendance, Payroll and Approvals for Garment Units"
+    />
     <meta
       property="og:description"
-      content="Biometric attendance, staff and production payroll, approvals and reporting for manufacturing units. One system, three ways in."
+      content="One record of the month: biometric punches, shift rules, approvals and payroll - for the office that closes monthly and the floor that closes weekly."
     />
     <meta property="og:url" content="https://zyraa.app/" />
     <meta property="og:locale" content="en_IN" />
-    <meta property="og:image" content="https://zyraa.app/og-image.png" />
+    <meta property="og:image" content="https://zyraa.app/assets/og-image.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Zyraa HRMS — the single system that runs the people side of your company" />
+    <meta
+      property="og:image:alt"
+      content="Zyraa HRMS emblem and wordmark - HRMS for garment manufacturing"
+    />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Zyraa HRMS — Attendance, Payroll and People in One System" />
+    <meta
+      name="twitter:title"
+      content="Zyraa HRMS - Attendance, Payroll and Approvals for Garment Units"
+    />
     <meta
       name="twitter:description"
-      content="Biometric attendance, staff and production payroll, approvals and reporting for manufacturing units."
+      content="Biometric attendance, staff and production payroll, approvals and 140+ reports for garment manufacturing units."
     />
-    <meta name="twitter:image" content="https://zyraa.app/og-image.png" />
+    <meta
+      name="twitter:image"
+      content="https://zyraa.app/assets/og-image.jpg"
+    />
 
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <!-- All static assets live in public/assets/ - replace the files, not the markup. -->
+    <link
+      rel="icon"
+      href="/assets/favicon-48.png"
+      type="image/png"
+      sizes="48x48"
+    />
+    <link
+      rel="icon"
+      href="/assets/favicon-32.png"
+      type="image/png"
+      sizes="32x32"
+    />
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+    <link rel="manifest" href="/assets/site.webmanifest" />
+
+    <!-- Google faces: the body/mono pair plus the fallbacks for the six brand
+         display faces (see src/styles/tokens.css and src/assets/fonts/). -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Fraunces:ital,opsz,wght@1,9..144,600..900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
 
@@ -52,18 +86,20 @@
         "name": "Zyraa HRMS",
         "applicationCategory": "BusinessApplication",
         "applicationSubCategory": "Human Resource Management System",
-        "operatingSystem": "Web, Android, iOS",
+        "operatingSystem": "Web, Android",
         "url": "https://zyraa.app/",
-        "image": "https://zyraa.app/og-image.png",
-        "description": "HRMS for manufacturing units: biometric attendance, staff and production payroll, leave and permission approvals, geo on-duty tracking and reporting.",
+        "image": "https://zyraa.app/assets/og-image.jpg",
+        "description": "HRMS for garment and knitwear manufacturing units: biometric attendance, staff and production payroll, approval pipelines, gate passes, geo on-duty tracking and 140+ reports.",
         "featureList": [
-          "Biometric attendance sync",
-          "Staff payroll",
-          "Production payroll with weekly, bi-weekly and monthly cycles",
-          "Leave and permission approval pipelines",
-          "Geo attendance and on-duty sessions",
-          "Advances and term loans with EMI schedules",
-          "MD portal and 140+ reports"
+          "Biometric face-terminal sync with an outbound-only site connector",
+          "Staff arrival timeline with late, permission and quarter-shift rules",
+          "Production pay by shifts earned, with weekly, bi-weekly and monthly cycles",
+          "Configurable approval pipelines for a dozen request types",
+          "Geo-fenced punch and photo-verified on-duty sessions",
+          "Gate outpass and tea-break QR registers",
+          "Staff payroll from Draft to Finalized to Paid, with PF and ESI",
+          "140+ reports with Excel and PDF export",
+          "MD portal with a read-only AI assistant"
         ],
         "author": {
           "@type": "Person",

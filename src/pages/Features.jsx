@@ -1,261 +1,371 @@
-import { useRef } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
 import FadingStars from "../components/FadingStars.jsx";
 import ShatterType from "../components/ShatterType.jsx";
+import Section from "../components/Section.jsx";
+import FitText from "../components/FitText.jsx";
 import Footer from "../components/Footer.jsx";
 import Seo from "../components/Seo.jsx";
+import Btn from "../components/Btn.jsx";
 import { Reveal, SplitWords } from "../components/Reveal.jsx";
+import { ArrowUpRight, Play } from "../components/Icons.jsx";
 import { site } from "../data/site.js";
+import { reports, reportCategories } from "../data/reports.js";
 import { useMedia } from "../hooks/useMedia.js";
+import { scrollToSelector } from "../hooks/useLenis.js";
 import "./features.css";
 
-function Arrow() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M6 18L18 6M8 6H18V16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 function FeaturesHero() {
-  const ref = useRef(null);
   const mobile = useMedia("(max-width: 760px)");
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "24%"]);
-  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
-
+  const moduleCount = site.pillars.reduce((n, p) => n + p.modules.length, 0);
   return (
-    <section className="features-hero" ref={ref}>
-      <FadingStars count={90} speed={0.95} trail={1.15} />
-      <div className="features-hero-glow" aria-hidden="true" />
+    <Section tone="ink" className="f-hero">
+      <FadingStars
+        count={90}
+        speed={0.9}
+        trail={1.15}
+        colors={["#92acff", "#dfe8e7", "#285ccc"]}
+      />
       <div className="grain" />
-      <motion.div className="container features-hero-inner" style={{ y: contentY, opacity }}>
-        <Reveal delay={0.1}>
+      <div className="container f-hero-inner">
+        <Reveal delay={0.05}>
           <span className="kicker">Features · {site.productName}</span>
         </Reveal>
         <ShatterType
           key={mobile ? "m" : "d"}
-          text="ONE RECORD OF THE MONTH."
-          className="features-hero-title"
-          cols={mobile ? 5 : 8}
+          text="EVERY RULE OF THE MONTH."
+          className="f-hero-title"
+          cols={mobile ? 5 : 9}
           rows={3}
           as="h1"
         />
-        <div className="features-hero-row">
-          <Reveal delay={0.6}>
-            <p className="features-hero-text">
-              {site.stats.modules} modules that share one attendance record, {site.stats.approvalTypes} approval
-              pipelines and {site.stats.reports}+ reports. Built for units where the office closes monthly and
-              the floor closes weekly.
+        <div className="f-hero-row">
+          <Reveal delay={0.5}>
+            <p className="lede">
+              {moduleCount} modules on one attendance record - from the face
+              terminal at the gate to the MD's morning brief. Every feature
+              below ships today; the demos run its real rules.
             </p>
           </Reveal>
-          <Reveal delay={0.7} className="features-hero-tags">
-            {site.modules.slice(0, 4).map((m) => (
-              <a key={m.id} href={`#${m.id}`}>
-                {m.short}
-              </a>
-            ))}
+          <Reveal delay={0.6} className="f-hero-stats">
+            <div>
+              <span className="figure">{site.stats.reports}+</span>
+              <small>reports</small>
+            </div>
+            <div>
+              <span className="figure">{site.stats.requestTypes}</span>
+              <small>request types</small>
+            </div>
+            <div>
+              <span className="figure">{site.stats.payCycles}</span>
+              <small>pay cycles</small>
+            </div>
           </Reveal>
         </div>
-      </motion.div>
-    </section>
+      </div>
+    </Section>
   );
 }
 
-function ModuleRow({ module: m, index }) {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const ghostX = useTransform(scrollYProgress, [0, 1], index % 2 ? ["-9%", "9%"] : ["9%", "-9%"]);
-  const ghostOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0, 0.07, 0]);
-
+/** Sticky index of the pillars; the active one follows the scroll. */
+function PillarNav() {
+  const [active, setActive] = useState(site.pillars[0].id);
+  useEffect(() => {
+    const els = site.pillars
+      .map((p) => document.getElementById(p.id))
+      .filter(Boolean);
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
+      { rootMargin: "-45% 0px -55% 0px" },
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
   return (
-    <article className={`module-row ${index % 2 ? "module-row--alt" : ""}`} id={m.id} ref={ref}>
-      <motion.div className="module-row-ghost" style={{ x: ghostX, opacity: ghostOpacity }} aria-hidden="true">
-        {m.short}
-      </motion.div>
-      <div className="container module-row-grid">
-        <div className="module-row-side">
-          <Reveal>
-            <span className="module-row-code">{m.code}</span>
-          </Reveal>
-          <Reveal delay={0.05}>
-            <h2 className="module-row-short">{m.short}</h2>
-          </Reveal>
-        </div>
-        <div className="module-row-main">
-          <SplitWords as="h3" className="module-row-name" text={m.name} delay={0.05} stagger={0.04} />
-          <Reveal delay={0.15}>
-            <p className="module-row-blurb">{m.blurb}</p>
-          </Reveal>
-          <ul className="module-row-features">
-            {m.features.map((f, i) => (
-              <Reveal key={f} as="li" delay={0.2 + i * 0.05}>
-                <span className="feature-dot" />
-                {f}
-              </Reveal>
-            ))}
-          </ul>
-          <Reveal delay={0.4} className="module-row-actions">
-            <Link className="pill-action" to="/contact" data-cursor="Demo">
-              <span className="pill">See it on your data</span>
-              <span className="pill-arrow">
-                <Arrow />
+    <nav className="pillar-nav" aria-label="Feature pillars">
+      {site.pillars.map((p, i) => (
+        <a
+          key={p.id}
+          href={`#${p.id}`}
+          className={active === p.id ? "is-active" : ""}
+          onClick={(e) => {
+            e.preventDefault();
+            scrollToSelector(`#${p.id}`);
+          }}
+        >
+          <span>0{i + 1}</span>
+          {p.name}
+        </a>
+      ))}
+    </nav>
+  );
+}
+
+function Module({ m, index }) {
+  return (
+    <article className="f-module" id={m.id}>
+      <Reveal className="f-module-head">
+        <span className="f-module-n figure">
+          {String(index + 1).padStart(2, "0")}
+        </span>
+        <h3 className="f-module-name">{m.name}</h3>
+      </Reveal>
+      <div className="f-module-body">
+        <Reveal delay={0.05}>
+          <p className="f-module-blurb">{m.blurb}</p>
+        </Reveal>
+        <ul className="f-module-list">
+          {m.features.map((f, i) => (
+            <Reveal as="li" key={f} delay={0.08 + i * 0.04} y={14}>
+              {f}
+            </Reveal>
+          ))}
+        </ul>
+        {m.demo && (
+          <Reveal delay={0.2}>
+            <Link
+              to={`/demos/${m.demo}`}
+              className="f-module-demo"
+              data-cursor="Play"
+            >
+              <span className="f-module-demo-icon">
+                <Play />
               </span>
+              Try it in the live demo
             </Link>
-            <a className="module-row-phone" href={`tel:+${site.primaryPhone.raw}`} data-cursor="Call">
-              or call {site.primaryPhone.label}
-            </a>
           </Reveal>
-        </div>
+        )}
       </div>
     </article>
   );
 }
 
+function Pillar({ pillar, index }) {
+  return (
+    <Section tone={pillar.tone} className="f-pillar" id={pillar.id}>
+      <div className="container f-pillar-grid">
+        <div className="f-pillar-side">
+          <div className="f-pillar-sticky">
+            <span className="kicker">Pillar 0{index + 1}</span>
+            <FitText as="h2" className="f-pillar-name display" max={170}>
+              {pillar.name}
+            </FitText>
+            <p className="f-pillar-title">{pillar.title}</p>
+            <ul className="f-pillar-toc">
+              {pillar.modules.map((m) => (
+                <li key={m.id}>
+                  <a
+                    href={`#${m.id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      scrollToSelector(`#${m.id}`);
+                    }}
+                  >
+                    {m.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <div className="f-pillar-modules">
+          {pillar.modules.map((m, i) => (
+            <Module key={m.id} m={m} index={i} />
+          ))}
+        </div>
+      </div>
+    </Section>
+  );
+}
+
 function Roles() {
   return (
-    <section className="roles" id="roles">
+    <Section tone="cream" className="section f-roles" id="roles">
       <div className="container">
-        <div className="roles-head">
-          <Reveal>
-            <span className="kicker">Roles &amp; permissions</span>
-          </Reveal>
-          <SplitWords as="h2" className="roles-title" text="Everyone sees exactly their own job." delay={0.05} />
-          <Reveal delay={0.2}>
-            <p className="roles-text">
-              Permissions are set per module, per user: Full, View or Hidden. Department approvers only ever see
-              their own departments, and employees only ever see themselves.
-            </p>
-          </Reveal>
+        <div className="f-section-head">
+          <span className="kicker">Roles &amp; access</span>
+          <SplitWords
+            as="h2"
+            className="h2"
+            text="Everyone sees exactly their own job."
+            accent="their own job."
+          />
+          <p className="lede">
+            Access is set per module - hidden, view or edit - and a login can be
+            tied to one branch. View-only pages stay fully browsable; only the
+            buttons that change data lock.
+          </p>
         </div>
-        <div className="roles-list">
+        <div className="f-roles-grid">
           {site.roles.map((r, i) => (
-            <Reveal key={r.name} delay={i * 0.07} className="role-row">
-              <span className="role-n">{String(i + 1).padStart(2, "0")}</span>
-              <strong>{r.name}</strong>
-              <span>{r.detail}</span>
+            <Reveal key={r.name} delay={i * 0.06} className="f-role">
+              <span className="f-role-n figure">0{i + 1}</span>
+              <h3 className="h3">{r.name}</h3>
+              <p>{r.detail}</p>
             </Reveal>
           ))}
         </div>
       </div>
-    </section>
+    </Section>
   );
 }
 
-const mobileFeatures = [
-  "Leave requests, multi-day and half-day",
-  "Late-In, Early-Out and mid-shift permissions",
-  "Missing-punch claims for past dates",
-  "GPS on-duty sessions with selfie punch",
-  "Approver dashboard for department heads",
-  "Voice input in Tamil, Hindi and English",
-];
-
-const adminFeatures = [
-  "Biometric device registration and status",
-  "Site connectors for factory-network devices",
-  "Shift creation for staff and production",
-  "Bulk import, export and attendance correction",
-  "Scheduled backups with offsite copies",
-  "Activity logging, including odd-hours access",
-];
-
-function Platform() {
+function ReportsTeaser() {
+  const counts = reportCategories.map((c) => ({
+    c,
+    n: reports.filter((r) => r.category === c).length,
+  }));
+  const max = Math.max(...counts.map((x) => x.n));
   return (
-    <section className="platform">
-      <div className="container platform-grid">
-        <Reveal className="platform-card">
-          <span className="kicker">Mobile app</span>
-          <h2>Approvals from the floor.</h2>
-          <p>
-            Employees raise requests and department heads clear them without walking to the office. Every action
-            carries who approved it, when, and with what comment.
+    <Section tone="lemon" className="section f-reports">
+      <div className="container f-reports-grid">
+        <div className="f-section-head">
+          <span className="kicker">Report Center</span>
+          <SplitWords
+            as="h2"
+            className="h2"
+            text={`${reports.length} reports. Nine shelves.`}
+            accent="Nine shelves."
+          />
+          <p className="lede">
+            Statutory statements, registers inspectors ask for, exception lists
+            HR acts on and one-page executive summaries - each with filters,
+            totals, and Excel and PDF export.
           </p>
-          <ul>
-            {mobileFeatures.map((f) => (
-              <li key={f}>
-                <span className="feature-dot" />
-                {f}
-              </li>
-            ))}
-          </ul>
-        </Reveal>
-        <Reveal delay={0.12} className="platform-card">
-          <span className="kicker">Administration</span>
-          <h2>The parts nobody should think about.</h2>
-          <p>
-            Devices, shifts, policies and backups. Set the late windows and the deduction slabs once and the
-            month applies them for you.
-          </p>
-          <ul>
-            {adminFeatures.map((f) => (
-              <li key={f}>
-                <span className="feature-dot" />
-                {f}
-              </li>
-            ))}
-          </ul>
-        </Reveal>
+          <Btn to="/demos/report-center" solid cursor="Search">
+            Search every report
+          </Btn>
+        </div>
+        <ul className="f-bars">
+          {counts.map(({ c, n }, i) => (
+            <Reveal as="li" key={c} delay={i * 0.05} y={10}>
+              <span className="f-bar-label">{c}</span>
+              <span className="f-bar">
+                <span style={{ width: `${(n / max) * 100}%` }} />
+              </span>
+              <span className="f-bar-n figure">{n}</span>
+            </Reveal>
+          ))}
+        </ul>
       </div>
-    </section>
+    </Section>
   );
 }
 
-function Trust() {
-  const items = [
-    { t: "Every override is logged", d: "Manual attendance changes need a reason, and the reason is stored with the user and the timestamp." },
-    { t: "Current-month requests only", d: "A published month stays published. Corrections go through a reviewed claim instead." },
-    { t: "Session locking", d: "Payroll moves Draft → Published → Paid, and a locked session cannot be quietly edited." },
-    { t: "Spoof detection", d: "Simulated-location punches are flagged rather than silently accepted." },
-  ];
+function Connector() {
   return (
-    <section className="trust">
+    <Section tone="night" className="section f-connector">
       <div className="container">
-        <div className="trust-head">
-          <Reveal>
-            <span className="kicker">Why the numbers hold</span>
-          </Reveal>
-          <SplitWords as="h2" className="trust-title" text="A register you can defend." delay={0.05} />
+        <div className="f-section-head">
+          <span className="kicker">Devices on the factory floor</span>
+          <SplitWords
+            as="h2"
+            className="h2"
+            text="The cloud can't reach your factory LAN. The connector reaches out."
+            accent="reaches out."
+          />
+          <p className="lede">
+            A small Windows service on a factory computer reads the face
+            terminals on the local network and sends punches out over HTTPS.
+            Nothing is opened in the firewall, and punches wait safely through
+            an internet outage.
+          </p>
         </div>
-        <div className="trust-grid">
-          {items.map((it, i) => (
-            <Reveal key={it.t} delay={i * 0.09} className="trust-card">
-              <h3>{it.t}</h3>
-              <p>{it.d}</p>
+        <div className="f-diagram" aria-hidden="true">
+          <svg viewBox="0 0 1000 300" className="f-diagram-svg">
+            <defs>
+              <linearGradient id="f-wire" x1="0" x2="1">
+                <stop offset="0" stopColor="#92acff" stopOpacity="0.2" />
+                <stop offset="1" stopColor="#f3f298" stopOpacity="0.6" />
+              </linearGradient>
+            </defs>
+            {[60, 150, 240].map((y) => (
+              <path
+                key={y}
+                d={`M150 ${y} C 260 ${y}, 300 150, 400 150`}
+                className="f-wire"
+              />
+            ))}
+            <path
+              d="M560 150 C 640 150, 660 150, 740 150"
+              className="f-wire f-wire--out"
+            />
+            <path d="M840 150 C 880 150, 880 70, 930 70" className="f-wire" />
+            <path d="M840 150 C 880 150, 880 230, 930 230" className="f-wire" />
+            {[60, 150, 240].map((y, i) => (
+              <circle key={y} r="5" className="f-packet">
+                <animateMotion
+                  dur="2.4s"
+                  begin={`${i * 0.6}s`}
+                  repeatCount="indefinite"
+                  path={`M150 ${y} C 260 ${y}, 300 150, 400 150`}
+                />
+              </circle>
+            ))}
+            <circle r="6" className="f-packet f-packet--out">
+              <animateMotion
+                dur="1.6s"
+                repeatCount="indefinite"
+                path="M560 150 C 640 150, 660 150, 740 150"
+              />
+            </circle>
+          </svg>
+          <div className="f-node f-node--devices">
+            <strong>Face terminals</strong>
+            <small>Factory LAN · port 4370</small>
+          </div>
+          <div className="f-node f-node--connector">
+            <strong>Site connector</strong>
+            <small>Outbound HTTPS only</small>
+          </div>
+          <div className="f-node f-node--cloud">
+            <strong>Zyraa server</strong>
+            <small>Cloud or on-site</small>
+          </div>
+          <div className="f-node f-node--apps">
+            <strong>Apps</strong>
+            <small>Admin · Web · Mobile</small>
+          </div>
+        </div>
+        <div className="f-connector-facts">
+          {[
+            ["3", "ways in at once: pull, JSON push and ADMS cloud push"],
+            ["15 s", "device status refresh, with nine diagnostic checks"],
+            ["0", "existing punches changed by a data fetch"],
+          ].map(([v, l]) => (
+            <Reveal key={l} className="f-fact">
+              <span className="figure">{v}</span>
+              <p>{l}</p>
             </Reveal>
           ))}
         </div>
       </div>
-    </section>
+    </Section>
   );
 }
 
-function FeaturesCTA() {
+function Roadmap() {
   return (
-    <section className="features-cta">
-      <FadingStars count={60} speed={0.8} trail={1.35} opacity={0.8} />
-      <div className="features-cta-fade" aria-hidden="true" />
-      <div className="container features-cta-inner">
-        <Reveal>
-          <span className="kicker">Next step</span>
-        </Reveal>
-        <SplitWords as="h2" className="features-cta-title" text="Run one month and compare." delay={0.05} />
-        <Reveal delay={0.25}>
-          <a className="features-cta-phone" href={`tel:+${site.primaryPhone.raw}`} data-cursor="Call">
-            {site.primaryPhone.label}
-          </a>
-        </Reveal>
-        <Reveal delay={0.3}>
-          <Link className="pill-action" to="/contact" data-cursor="Demo">
-            <span className="pill">Book a demo</span>
-            <span className="pill-arrow">
-              <Arrow />
-            </span>
-          </Link>
-        </Reveal>
+    <Section tone="sand" className="section f-roadmap">
+      <div className="container f-roadmap-inner">
+        <span className="kicker">What's next</span>
+        <SplitWords
+          as="h2"
+          className="h2"
+          text="Next: the ERP, on the same record."
+          accent="same record."
+        />
+        <p className="lede">
+          Production planning, merchandising, fabric, cutting, sewing, finishing
+          and shipment modules are being designed as Phase 2 - built on the
+          people data Zyraa already keeps.
+        </p>
+        <Link to="/contact" className="text-link">
+          Talk to us about the roadmap <ArrowUpRight />
+        </Link>
       </div>
-    </section>
+    </Section>
   );
 }
 
@@ -265,18 +375,17 @@ export default function Features() {
       <Seo
         title="Features"
         path="/features"
-        description={`${site.stats.modules} modules on one attendance record: biometric attendance, staff and production payroll, leave and permissions, geo on-duty, advances and ${site.stats.reports}+ reports.`}
+        description="Every Zyraa module: attendance engine, biometric devices, shifts, geo on-duty, leave and approvals, gate passes, staff and production payroll, compensation, reports and the MD portal."
       />
       <FeaturesHero />
-      <div className="module-list">
-        {site.modules.map((m, i) => (
-          <ModuleRow key={m.id} module={m} index={i} />
-        ))}
-      </div>
+      <PillarNav />
+      {site.pillars.map((p, i) => (
+        <Pillar key={p.id} pillar={p} index={i} />
+      ))}
+      <Connector />
       <Roles />
-      <Platform />
-      <Trust />
-      <FeaturesCTA />
+      <ReportsTeaser />
+      <Roadmap />
       <Footer />
     </main>
   );

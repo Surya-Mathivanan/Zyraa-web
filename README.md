@@ -1,117 +1,139 @@
-# ZYRAA HRMS — website
+# ZYRAA HRMS - website
 
-Static marketing site for **Zyraa**, an HRMS for manufacturing units: biometric attendance,
-staff and production payroll, leave and permission approvals, geo on-duty tracking and
-reporting. Designed and built by **Surya** in Tiruppur.
+Marketing site for **Zyraa**, the HRMS for garment and knitwear units: biometric attendance,
+shift rules, approval pipelines, staff and production payroll, gate passes, geo on-duty,
+140+ reports and an MD portal - across an HR admin portal, an employee web app and a mobile
+app. Designed and built by **Surya** in Tiruppur.
 
-The site covers one product only. There is no team page — Zyraa is a one-developer product.
+Every product statement on the site was checked against the three product repositories
+(HR portal, employee web app, mobile app). Keep it that way: nothing goes on the site that
+the product does not ship. Notably, the site does **not** claim full & final settlement,
+two-factor login, Meta's WhatsApp Cloud API, Tamil/Hindi in the mobile app, or the ERP
+modules (those are presented as roadmap only).
 
 ## Stack
 
-- React 19 + Vite
-- react-router-dom (Home, Features, About, Blogs, Blog post, Contact, 404)
-- framer-motion (scroll parallax, reveals, page transitions)
-- lenis (smooth scrolling)
-- Google Fonts: Sora (display), Inter (body), JetBrains Mono (labels and figures)
+- React 19 + Vite 8, react-router-dom 7 (every route lazy-loaded and preloaded on idle)
+- framer-motion (scroll parallax, reveals, page transitions), lenis (smooth scrolling)
+- No CSS framework: plain CSS, one file per page/component
 
 ## Run
 
 ```bash
 npm install
 npm run dev       # http://localhost:5173
-npm run build     # production build in dist/
-npm run preview   # serve dist/
+npm run build     # production build in dist/ (hashed files in dist/static/)
+npm run lint      # oxlint
 ```
 
 ## Structure
 
 ```
 src/
-  App.jsx                 routes, smooth scroll, page transitions, cursor
-  data/site.js            product name, url, phone, modules, roles, posts (edit content here)
-  lib/date.js             shared date formatting
-  components/
-    Nav.jsx / Footer.jsx
-    Seo.jsx               per-route title, description and canonical
-    FadingStars.jsx       stars rising from beyond the frame on fading trails
-    SignalType.jsx        "ZYRAA" hero wordmark: letters flicker on like a neon sign
-    ShatterType.jsx       glass-shard headline on /features: hover to crack, click to shatter
-    UserCursor.jsx        collaborator-style cursor with a name tag (desktop only)
-    Reveal.jsx            scroll reveal helpers
-    ScrollCircle.jsx      rotating "scroll to explore" button
-  pages/                  Home, Features, About, Blogs, BlogPost, Contact, NotFound
-                          (+ one CSS file each; Blogs and BlogPost share blogs.css)
+  main.jsx                entry: global CSS layer + brand font loader
+  App.jsx                 routes, smooth scroll, page curtain, cursor
+  styles/
+    tokens.css            palette, type roles, colour tones (the only design variables)
+    base.css              reset and document defaults
+    shared.css            layout, labels, headings, buttons, chips, marquee
+  data/
+    site.js               product facts: nav, stats, apps, the 5 pillars / 19 modules, roles
+    reports.js            the full Report Center catalogue (148 reports, 9 categories)
+    posts/index.js        journal index (title, accent, category, date, tone…)
+    posts/<slug>.js       one article body per file, loaded on demand
+  lib/
+    brandFonts.js         loads licensed brand fonts dropped into src/assets/fonts/
+    rules/                the product's rules as pure functions (used by the demos):
+                          arrival.js (staff timeline + late pool), production.js (shift
+                          ladder), payroll.js (staff payslip), requests.js (pipelines +
+                          request window), time.js
+  demos/                  ten interactive demos, one chunk each, + registry.js + kit
+  components/             Nav, Footer, Section (tones), Btn, Reveal/SplitWords, ScrollText,
+                          StitchLine, Marquee, CountUp, FadingStars, SignalType,
+                          ShatterType, UserCursor, mockups/ (phone + browser screens)
+  pages/                  Home, Features, Apps, Demos, Demo, About, Blogs, BlogPost,
+                          Contact, NotFound - each with its own stylesheet
 ```
 
-All content lives in `src/data/site.js`. Changing the phone number, the module list or the
-blog posts is a one-file edit.
+## CSS architecture
 
-## The Fading Stars animation
+`tokens.css`, `base.css` and `shared.css` are the only global CSS (≈17 kB). Every page and
+component imports its own stylesheet, so Vite splits CSS per route chunk: a visitor to Home
+never downloads the demo or journal styles.
 
-`FadingStars.jsx` is the home and background animation: stars seeded below the bottom edge
-drift upward with a slight sway, each trailing a tail that fades behind it. Depth drives
-size, speed, trail length and brightness together, so near stars read as near.
+## Colour: palette and tones
 
-It is a hand-written canvas component, not the React Bits Pro component. The Pro version was
-blocked three ways — no `REACTBITS_LICENSE_KEY`, no `components.json`, and the `-tw` variant
-needs Tailwind, which this project does not use.
+The 13 brand colours are in `tokens.css`. They are combined into **tones** - full colour role
+sets (`--bg`, `--fg`, `--fg-2`, `--fg-3`, `--line`, `--card`, `--accent`, `--accent-2`,
+`--on-accent`), each checked for ≥ 4.5:1 body-text contrast:
 
-Props: `count`, `speed`, `trail`, `size`, `colors`, `opacity`. The population scales with the
-canvas area, so a slim band is not as busy as a full-height hero.
+| Tone    | Background | Text    | Accent  |
+| ------- | ---------- | ------- | ------- |
+| night   | #0E0929    | #EBF1F5 | #F3F298 |
+| ink     | #010B13    | #DFE8E7 | #92ACFF |
+| indigo  | #353A96    | #FCF0D6 | #F3F298 |
+| cobalt  | #285CCC    | #FFFFFF | #FFEFB4 |
+| crimson | #B40023    | #FCF0D6 | #F3F298 |
+| rust    | #A0430A    | #FCF0D6 | #FFEFB4 |
+| cream   | #FCF0D6    | #0E0929 | #B40023 |
+| sand    | #F5E4D0    | #010B13 | #A0430A |
+| butter  | #FFEFB4    | #0E0929 | #B40023 |
+| lemon   | #F3F298    | #0E0929 | #353A96 |
+| mist    | #EBF1F5    | #0E0929 | #285CCC |
+| sage    | #DFE8E7    | #010B13 | #353A96 |
 
-Implementation notes:
+Wrap a section in `<Section tone="cream">`. When it crosses the middle of the screen its tone
+is written to `<html data-tone>`, and because the tone variables are registered with
+`@property`, the whole page cross-fades to it - that is the smooth section-to-section colour
+change. `.tone-x` pins a tone on a single element (cards, mockups). Each page has its own
+sequence: Home night → cream → indigo → ink → butter → sage → mist → sand; Features ink plus a
+tone per pillar; About sand/cream/rust; Journal cream; Contact indigo/night/sage; 404 crimson.
 
-- Device pixel ratio is capped at 1.75.
-- The RAF loop stops while the canvas is off-screen (IntersectionObserver) or the tab is
-  hidden (`visibilitychange`), and resize is debounced.
-- Trails are drawn as six fading, narrowing segments rather than a gradient object per star
-  per frame.
-- The first frame is painted synchronously, so there is no empty-canvas flash and a surface
-  where RAF is throttled to nothing still shows stars.
-- Under `prefers-reduced-motion` it paints one static starfield and never starts a loop.
+## Typography
+
+Six brand display faces fill named roles. Their files are **not** in the repo (all six are
+commercial or personal-use-only licences); drop licensed files into `src/assets/fonts/` named
+after the family and they load automatically - see `src/assets/fonts/README.md`.
+
+| Role (`tokens.css`)                               | Brand face    | Fallback shown until the file is added |
+| ------------------------------------------------- | ------------- | -------------------------------------- |
+| `--font-chomp` - giant display words              | Whole Chomp   | Anton                                  |
+| `--font-moste` - page and section headings        | Moste         | Bricolage Grotesque                    |
+| `--font-romance` - italic accent word in headings | Young Romance | Fraunces Italic                        |
+| `--font-trufter` - card and article titles        | Trufter       | Bricolage Grotesque                    |
+| `--font-seatren` - figures, stats, marquee        | Seatren       | Bricolage Grotesque (condensed)        |
+| `--font-star` - nav, buttons, chips               | Starplayer    | Bricolage Grotesque                    |
+
+Body text is Inter; labels are JetBrains Mono. Mark an accent word in a heading with
+`<SplitWords text="…" accent="phrase" />` or `<em className="accent-word">`.
+
+## Live demos
+
+`/demos` lists ten demos; each runs the product's real defaults from `src/lib/rules/`:
+arrival timeline, production day, approval pipeline, payslip builder, geo punch & on-duty,
+gate pass & tea break, employee month, device board, Report Center and the MD assistant
+(scripted, sample data). Add one by writing a component in `src/demos/` and an entry in
+`registry.js`.
+
+## Journal
+
+`src/data/posts/index.js` lists the articles; each body is `src/data/posts/<slug>.js`, an
+array of blocks: `p`, `h2`, `list`, `steps`, `quote`, `callout`, `figure` (`**bold**` and
+`*italic*` allowed in text). Add the slug to `public/sitemap.xml`.
 
 ## Motion and `prefers-reduced-motion`
 
-`FadingStars` and `ShatterType` check the preference themselves. `MotionConfig
-reducedMotion="user"` in `main.jsx` covers every framer-motion animation: transforms snap to
-their target while opacity still animates, so the page curtain, `Reveal` and `SplitWords`
-settle instantly without hiding content. `SignalType` resolves to a fully lit sign with no
-flicker, and its resting CSS state is lit, so a missed viewport observer costs the animation
-rather than the headline.
+`MotionConfig reducedMotion="user"` covers framer-motion animations. Scroll-linked parallax
+goes through `useParallax()`, which returns a still value under reduced motion; the stitch
+lines, scroll text, star canvas, neon wordmark, shattered headline and colour fades all honour
+the preference too.
 
-Not yet covered: scroll-linked parallax (`useScroll` / `useTransform` in the page sections)
-still runs for users who ask for reduced motion.
+## Assets, SEO, deploy
 
-## SEO
-
-- `index.html` holds the static title, description, canonical, Open Graph/Twitter tags and
-  `SoftwareApplication` JSON-LD. Social scrapers do not run JS, so these homepage values are
-  what every shared link preview uses.
-- `Seo.jsx` sets per-route title, description and canonical for crawlers that do run JS, and
-  marks the 404 and unknown post slugs `noindex, follow`.
-- `public/robots.txt` and `public/sitemap.xml` list the public routes.
-- **`og-image.png` is not in the repo yet.** `index.html` references `/og-image.png` at
-  1200x630; drop that file into `public/` or link previews will render without an image.
-- **The domain is a placeholder.** `https://zyraa.app` appears in three places: `site.url` in
-  `src/data/site.js`, the absolute URLs in `index.html`, and `public/sitemap.xml` (plus
-  `robots.txt`). Update all of them together once the real domain is known.
-
-## Blog content
-
-`site.posts` drives both `/blogs` and `/blogs/<slug>`. Each entry needs `slug`, `title`,
-`category`, `date` (ISO), `readMins`, `excerpt` and a `body` array of paragraphs. Categories
-become the filter chips automatically, and the newest `date` is featured at the top.
-
-**The three posts currently in there are placeholder copy** written to show the layout —
-replace their text with real articles, or empty the array and the index renders its empty
-state. Update `public/sitemap.xml` when slugs change.
-
-## Deploy
-
-The build is fully static. Upload `dist/` to any static host (Netlify, Vercel, GitHub Pages,
-cPanel). For client-side routing, configure the host to serve `index.html` for all paths —
-`public/_redirects` already contains `/* /index.html 200` for Netlify.
-
-Unknown paths render the `NotFound` page, which sets `noindex`. Because the host rewrites
-every path to `index.html`, that page is still served with HTTP 200; a true 404 status would
-need prerendering or host-level rules.
+- Every static asset lives in `public/assets/` - see `ASSETS.md`.
+- `index.html` holds the static title, Open Graph tags and JSON-LD (social scrapers don't run
+  JS). `Seo.jsx` sets per-route tags. **The domain `https://zyraa.app` is a placeholder** in
+  `site.js`, `index.html`, `public/sitemap.xml` and `robots.txt`.
+- The build is static: upload `dist/`, and serve `index.html` for every path
+  (`public/_redirects` does this on Netlify). Hashed bundles in `dist/static/` can be cached
+  forever; files in `dist/assets/` are swap-in-place and should not be.

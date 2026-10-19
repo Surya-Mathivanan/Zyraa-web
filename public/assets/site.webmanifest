@@ -1,0 +1,14 @@
+{
+  "name": "Zyraa HRMS",
+  "short_name": "Zyraa",
+  "description": "HRMS for garment manufacturing: biometric attendance, staff and production payroll, approvals and reporting.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0e0929",
+  "theme_color": "#0e0929",
+  "icons": [
+    { "src": "/assets/favicon-48.png", "type": "image/png", "sizes": "48x48" },
+    { "src": "/assets/apple-touch-icon.png", "type": "image/png", "sizes": "180x180" },
+    { "src": "/assets/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" }
+  ]
+}

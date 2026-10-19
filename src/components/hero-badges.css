@@ -1,0 +1,383 @@
+/* Hero badges as woven garment labels: squared tags with a stitched seam,
+   a numbered colour block with a punched hole, and a hard retro offset
+   shadow. Each carries a small moving icon. */
+
+.hb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 20px;
+  /* room for the offset shadows */
+  padding: 2px 8px 8px 0;
+}
+
+.hb-badge {
+  --hb-glow: var(--lemon);
+  --hb-ink: var(--night);
+  --hb-icon: var(--hb-glow);
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+  height: 46px;
+  padding-right: 16px;
+  border: 1.5px solid color-mix(in srgb, var(--fg) 72%, transparent);
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--bg) 88%, var(--fg));
+  box-shadow: 4px 4px 0 var(--hb-glow);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+  transition: box-shadow 300ms var(--ease-out);
+}
+
+.hb-badge:hover {
+  box-shadow: 6px 6px 0 var(--hb-glow);
+}
+
+.hb-badge:active {
+  box-shadow: 1px 1px 0 var(--hb-glow);
+}
+
+/* The seam: a dashed stitch running just inside the edge. */
+.hb-badge::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1px dashed color-mix(in srgb, var(--fg) 28%, transparent);
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.hb-badge--where {
+  --hb-glow: var(--periwinkle);
+}
+
+.hb-badge--apps {
+  --hb-glow: var(--crimson);
+  --hb-ink: var(--cream);
+  --hb-icon: #ff8fa3;
+}
+
+/* Label number, with a punched hole like a hang tag. */
+.hb-code {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: -1.5px 0 -1.5px -1.5px;
+  padding: 0 11px 0 9px;
+  border-radius: 5px 0 0 5px;
+  background: var(--hb-glow);
+  color: var(--hb-ink);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  transition: background 300ms ease;
+}
+
+.hb-code::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+.hb-icon-wrap {
+  display: grid;
+  place-items: center;
+  min-width: 42px;
+  padding: 0 4px 0 12px;
+  color: var(--hb-icon);
+}
+
+.hb-body {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.hb-strong {
+  color: var(--fg);
+}
+
+.hb-label {
+  color: var(--fg-3);
+}
+
+/* ── Word rotator ── */
+.hb-rotator {
+  position: relative;
+  display: inline-grid;
+  overflow: hidden;
+  height: 1.5em;
+  line-height: 1.5em;
+  color: var(--fg);
+}
+
+.hb-rotator-sizer,
+.hb-rotator-word {
+  grid-area: 1 / 1;
+}
+
+.hb-rotator-sizer {
+  visibility: hidden;
+}
+
+.hb-rotator-word {
+  display: inline-block;
+}
+
+/* ── Needle ── */
+.hb-icon {
+  width: 22px;
+  height: 22px;
+  overflow: visible;
+}
+
+.hb-cloth {
+  stroke: currentColor;
+  stroke-width: 1.4;
+  opacity: 0.25;
+}
+
+.hb-thread {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 3 3;
+  animation: hb-stitch 1.1s linear infinite;
+}
+
+@keyframes hb-stitch {
+  to {
+    stroke-dashoffset: -12;
+  }
+}
+
+.hb-needle-body {
+  animation: hb-needle 1.1s var(--ease-in-out) infinite;
+}
+
+@keyframes hb-needle {
+  0%,
+  100% {
+    transform: translateY(-3px);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+.hb-needle-steel {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.hb-needle-eye {
+  fill: var(--bg);
+}
+
+/* ── Pin ── */
+.hb-pin-shape {
+  fill: currentColor;
+}
+
+.hb-pin-dot {
+  fill: var(--bg);
+}
+
+.hb-pin-body {
+  animation: hb-bob 2.2s var(--ease-in-out) infinite;
+}
+
+@keyframes hb-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2.5px);
+  }
+}
+
+.hb-ripple {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hb-ripple 2.2s ease-out infinite;
+}
+
+.hb-ripple--late {
+  animation-delay: 1.1s;
+}
+
+@keyframes hb-ripple {
+  from {
+    transform: scale(0.2);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* ── Devices ── */
+.hb-devices {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.hb-dev {
+  width: 16px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.35;
+  transform: translateY(0) scale(0.9);
+  transition: opacity 350ms ease, transform 450ms var(--ease-out), filter 350ms ease;
+}
+
+.hb-dev--phone {
+  width: 11px;
+}
+
+.hb-dev.is-on {
+  opacity: 1;
+  transform: translateY(-1px) scale(1.12);
+  filter: drop-shadow(0 0 5px currentColor);
+}
+
+.hb-apps {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.hb-apps span {
+  color: var(--fg-3);
+  transition: color 350ms ease;
+}
+
+.hb-apps span + span::before {
+  content: "·";
+  margin-right: 4px;
+  color: var(--fg-3);
+}
+
+.hb-apps span.is-on {
+  color: var(--fg);
+}
+
+/* ── Phones: one label, three messages taking turns ── */
+.hb-cycle {
+  display: flex;
+  width: calc(100% - 6px);
+  max-width: 420px;
+  height: 44px;
+  margin-bottom: 6px;
+  padding-right: 2px;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+}
+
+.hb-cycle .hb-code {
+  gap: 6px;
+  padding: 0 9px 0 8px;
+}
+
+.hb-cycle-stage {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  margin: -1.5px 0 -1.5px -1.5px;
+  border-radius: 5px 0 0 5px;
+}
+
+.hb-cycle-slide {
+  display: inline-flex;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.hb-cycle .hb-code {
+  margin: 0;
+}
+
+.hb-cycle .hb-icon-wrap {
+  min-width: 34px;
+  padding: 0 2px 0 8px;
+}
+
+.hb-cycle .hb-dots button {
+  width: 14px;
+}
+
+.hb-cycle .hb-body {
+  overflow: hidden;
+}
+
+.hb-dots {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  margin-left: 6px;
+}
+
+/* 24px tap targets around small dots; the current one stretches into a bar. */
+.hb-dots button {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 32px;
+}
+
+.hb-dots button::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--fg) 30%, transparent);
+  transition: width 400ms var(--ease-out), background 300ms ease;
+}
+
+.hb-dots button.is-on::before {
+  width: 14px;
+  background: var(--hb-glow);
+}
+
+
+/* Very small phones: drop the label number so the longest message
+   ("HRMS for production floors") still fits on one line. */
+@media (max-width: 345px) {
+  .hb-cycle .hb-code {
+    display: none;
+  }
+
+  .hb-cycle .hb-icon-wrap {
+    padding-left: 6px;
+  }
+}
+
+@media (max-width: 380px) {
+  .hb-cycle {
+    font-size: 10px;
+  }
+}

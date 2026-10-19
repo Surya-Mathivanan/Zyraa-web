@@ -1,182 +1,121 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
-import FadingStars from "../components/FadingStars.jsx";
+import { AnimatePresence, motion } from "framer-motion";
+import Section from "../components/Section.jsx";
 import Footer from "../components/Footer.jsx";
 import Seo from "../components/Seo.jsx";
 import { Reveal, SplitWords } from "../components/Reveal.jsx";
-import { site } from "../data/site.js";
+import { ArrowUpRight } from "../components/Icons.jsx";
+import AccentTitle from "../components/AccentTitle.jsx";
+import PostCover, { CategoryIcon } from "../components/PostCover.jsx";
+import JournalCard from "../components/JournalCard.jsx";
+import { posts } from "../data/posts/index.js";
+import { categoryOf } from "../data/categories.js";
 import { formatDate } from "../lib/date.js";
 import "./blogs.css";
 
-function Arrow() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M6 18L18 6M8 6H18V16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-const posts = site.posts ?? [];
-// Derived once: `posts` is static module data, so this needs no hook.
-const sorted = [...posts].sort((a, b) => new Date(b.date) - new Date(a.date));
 const categories = ["All", ...new Set(posts.map((p) => p.category))];
+const countOf = (c) => (c === "All" ? posts.length : posts.filter((p) => p.category === c).length);
 
-function BlogsHero() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "24%"]);
-  const opacity = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
+// Wide cards in the bento grid (positions in the list under the featured
+// article). With nine cards this tiles 3 columns × 4 rows with no gaps.
+const WIDE = new Set([0, 6, 7]);
 
+function Featured({ post }) {
   return (
-    <section className="blogs-hero" ref={ref}>
-      <FadingStars count={80} speed={0.9} trail={1.2} />
-      <div className="blogs-hero-glow" aria-hidden="true" />
-      <div className="grain" />
-      <motion.div className="container blogs-hero-inner" style={{ y, opacity }}>
-        <Reveal delay={0.1}>
-          <span className="kicker">Blogs · {site.productName}</span>
-        </Reveal>
-        <SplitWords as="h1" className="blogs-hero-title" text="Notes from the floor." delay={0.2} stagger={0.09} />
-        <Reveal delay={0.5}>
-          <p className="blogs-hero-text">
-            What building an HRMS for manufacturing actually teaches you: where attendance breaks, why payroll
-            disagrees with the register, and which rules are worth keeping.
-          </p>
-        </Reveal>
-      </motion.div>
-    </section>
-  );
-}
-
-function PostCard({ post, index, featured = false }) {
-  return (
-    <Reveal delay={index * 0.08} className={`post-card-wrap ${featured ? "post-card-wrap--featured" : ""}`}>
-      <Link to={`/blogs/${post.slug}`} className={`post-card ${featured ? "post-card--featured" : ""}`} data-cursor="Read">
-        <div className="post-card-top">
-          <span className="post-card-cat">{post.category}</span>
-          <span className="post-card-meta">
-            {formatDate(post.date)} · {post.readMins} min read
+    <Reveal>
+      <Link
+        to={`/blogs/${post.slug}`}
+        className="bl-featured is-hover-art"
+        style={{ "--cat": categoryOf(post.category).ink }}
+        data-cursor="Read"
+      >
+        <div className="bl-featured-copy">
+          <span className="bl-featured-flag">Latest article</span>
+          <span className="bl-meta">
+            <CategoryIcon name={post.category} />
+            {post.category} · {formatDate(post.date)} · {post.readMins} min read
+          </span>
+          <h2 className="bl-featured-title">
+            <AccentTitle title={post.title} accent={post.accent} />
+          </h2>
+          <p>{post.excerpt}</p>
+          <span className="bl-cta">
+            Read the article <ArrowUpRight />
           </span>
         </div>
-        <h2 className="post-card-title">{post.title}</h2>
-        <p className="post-card-excerpt">{post.excerpt}</p>
-        <span className="post-card-link">
-          Read article <Arrow />
-        </span>
+        <PostCover post={post} className="bl-featured-cover" />
       </Link>
     </Reveal>
   );
 }
 
-function EmptyState() {
-  return (
-    <Reveal className="blogs-empty">
-      <span className="blogs-empty-mark" aria-hidden="true">
-        —
-      </span>
-      <h2>No articles yet.</h2>
-      <p>The first few are being written. In the meantime, the fastest way to get an answer is to call.</p>
-      <a className="blogs-empty-phone" href={`tel:+${site.primaryPhone.raw}`} data-cursor="Call">
-        {site.primaryPhone.label}
-      </a>
-    </Reveal>
-  );
-}
-
-function PostList() {
-  const [active, setActive] = useState("All");
-  const shown = active === "All" ? sorted : sorted.filter((p) => p.category === active);
-
-  if (!posts.length) {
-    return (
-      <section className="blogs-list">
-        <div className="container">
-          <EmptyState />
-        </div>
-      </section>
-    );
-  }
-
-  return (
-    <section className="blogs-list">
-      <div className="container">
-        <div className="blogs-list-head">
-          <Reveal>
-            <span className="kicker">
-              {posts.length} article{posts.length === 1 ? "" : "s"}
-            </span>
-          </Reveal>
-          {categories.length > 2 && (
-            <Reveal delay={0.08} className="blogs-filters">
-              {categories.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  className={`blogs-filter ${active === c ? "is-active" : ""}`}
-                  onClick={() => setActive(c)}
-                  aria-pressed={active === c}
-                >
-                  {c}
-                </button>
-              ))}
-            </Reveal>
-          )}
-        </div>
-
-        <div className="post-grid">
-          {shown.map((p, i) => (
-            <PostCard key={p.slug} post={p} index={i} featured={active === "All" && i === 0} />
-          ))}
-        </div>
-
-        {!shown.length && (
-          <Reveal className="blogs-none">
-            <p>Nothing filed under “{active}” yet.</p>
-          </Reveal>
-        )}
-      </div>
-    </section>
-  );
-}
-
-function BlogsCTA() {
-  return (
-    <section className="blogs-cta">
-      <div className="container blogs-cta-inner">
-        <Reveal>
-          <span className="kicker">Next step</span>
-        </Reveal>
-        <SplitWords as="h2" className="blogs-cta-title" text="Got a month that never adds up?" delay={0.05} />
-        <Reveal delay={0.25}>
-          <p className="blogs-cta-text">
-            Most of these notes started as a question from a unit in {site.location.city}. Send yours.
-          </p>
-        </Reveal>
-        <Reveal delay={0.3}>
-          <Link className="pill-action" to="/contact" data-cursor="Talk">
-            <span className="pill">Get in touch</span>
-            <span className="pill-arrow">
-              <Arrow />
-            </span>
-          </Link>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
 export default function Blogs() {
+  const [active, setActive] = useState("All");
+  const shown = active === "All" ? posts : posts.filter((p) => p.category === active);
+  const [first, ...rest] = shown;
+  const bento = rest.length >= 5;
+
   return (
     <main className="page blogs">
       <Seo
-        title="Blogs"
+        title="Journal"
         path="/blogs"
-        description="Notes on building an HRMS for manufacturing: attendance, payroll cycles, approval pipelines and the rules that keep a register defensible."
+        description="Notes on garment-industry HR: attendance that becomes payroll, the quarter-shift rule, production pay by the shift, request windows, biometrics on factory networks and more."
       />
-      <BlogsHero />
-      <PostList />
-      <BlogsCTA />
+      <Section tone="cream" className="bl-hero">
+        <div className="container bl-hero-inner">
+          <Reveal>
+            <span className="kicker">The journal · {posts.length} articles</span>
+          </Reveal>
+          <SplitWords as="h1" className="bl-hero-title" text="Notes from the floor." accent="the floor." delay={0.1} />
+          <Reveal delay={0.35}>
+            <p className="lede">
+              What building an HRMS for garment units teaches you: where attendance breaks, why payroll disagrees with
+              the register, and which rules are worth keeping.
+            </p>
+          </Reveal>
+          <Reveal delay={0.45} className="bl-filters" role="group" aria-label="Filter by category">
+            {categories.map((c) => (
+              <button
+                key={c}
+                type="button"
+                className={active === c ? "is-on" : ""}
+                aria-pressed={active === c}
+                onClick={() => setActive(c)}
+                style={c === "All" ? undefined : { "--cat": categoryOf(c).ink }}
+              >
+                {c !== "All" && <CategoryIcon name={c} />}
+                {c}
+                <span className="bl-filter-n">{countOf(c)}</span>
+              </button>
+            ))}
+          </Reveal>
+        </div>
+      </Section>
+
+      <Section tone="cream" className="bl-list">
+        <div className="container">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={active}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {first && <Featured post={first} />}
+              {rest.length > 0 && (
+                <div className="bl-grid">
+                  {rest.map((p, i) => (
+                    <JournalCard key={p.slug} post={p} delay={(i % 3) * 0.06} wide={bento && WIDE.has(i)} />
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </Section>
       <Footer />
     </main>
   );

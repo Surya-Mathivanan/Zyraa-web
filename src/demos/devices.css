@@ -1,0 +1,147 @@
+.dv {
+  display: grid;
+  gap: 18px;
+}
+
+.dv-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.dv-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 16px 16px 40px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+  transition: border-color 300ms ease, background 300ms ease;
+}
+
+.dv-card small {
+  color: var(--fg-3);
+  font-size: 12px;
+}
+
+.dv-led {
+  position: absolute;
+  left: 16px;
+  top: 20px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #2f9e64;
+  box-shadow: 0 0 0 4px rgba(47, 158, 100, 0.25);
+  animation: dv-blink 2.4s ease-in-out infinite;
+}
+
+.dv-card.is-down {
+  border-color: #b40023;
+  background: rgba(180, 0, 35, 0.1);
+}
+
+.dv-card.is-down .dv-led {
+  background: #ff5c7a;
+  box-shadow: 0 0 0 4px rgba(255, 92, 122, 0.25);
+  animation: none;
+}
+
+@keyframes dv-blink {
+  50% {
+    box-shadow: 0 0 0 7px rgba(47, 158, 100, 0.08);
+  }
+}
+
+.dv-checks {
+  display: grid;
+  gap: 4px;
+}
+
+.dv-check {
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.dv-check span {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-3);
+}
+
+.dv-check em {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-style: normal;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dv-check.is-ok em { color: #5fd39a; }
+.dv-check.is-bad { background: rgba(180, 0, 35, 0.2); }
+.dv-check.is-bad em { color: #ff8fa3; }
+
+.dv-fix {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--card);
+  border-left: 3px solid var(--accent);
+}
+
+.dv-taps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dv-taps span {
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  border: 1px solid var(--line);
+}
+
+.dv-taps .is-dropped {
+  text-decoration: line-through;
+  opacity: 0.45;
+}
+
+.dv-kept {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.dv-kept div {
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+
+.dv-kept small {
+  display: block;
+  font-size: 11px;
+  color: var(--fg-3);
+}
+
+.dv-kept b {
+  font-family: var(--font-seatren);
+  font-stretch: 80%;
+  font-size: 24px;
+}
+
+@media (max-width: 600px) {
+  .dv-grid,
+  .dv-kept {
+    grid-template-columns: 1fr 1fr;
+  }
+}

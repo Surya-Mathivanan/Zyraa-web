@@ -1,0 +1,310 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   Design tokens: palette, type roles, tones, motion.
+   Everything visual on the site reads from these variables.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Tone variables are registered so the browser can animate them. Switching
+   html[data-tone] then cross-fades every colour on the page at once - the
+   section-to-section colour transitions all come from this. */
+@property --bg {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #0e0929;
+}
+@property --fg {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #ebf1f5;
+}
+@property --fg-2 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(235, 241, 245, 0.74);
+}
+@property --fg-3 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(235, 241, 245, 0.5);
+}
+@property --line {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(146, 172, 255, 0.16);
+}
+@property --card {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(146, 172, 255, 0.06);
+}
+@property --accent {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #f3f298;
+}
+@property --accent-2 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #92acff;
+}
+@property --on-accent {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #0e0929;
+}
+
+:root {
+  /* Brand palette */
+  --periwinkle: #92acff;
+  --night: #0e0929;
+  --mist: #ebf1f5;
+  --ink: #010b13;
+  --crimson: #b40023;
+  --cream: #fcf0d6;
+  --indigo: #353a96;
+  --lemon: #f3f298;
+  --sage: #dfe8e7;
+  --rust: #a0430a;
+  --butter: #ffefb4;
+  --sand: #f5e4d0;
+  --cobalt: #285ccc;
+
+  /* Type roles. Each brand face is loaded from src/assets/fonts/ when its
+     licensed file is present (see src/lib/brandFonts.js); until then the
+     Google fallback that matches its character renders instead. */
+  --font-chomp:
+    "Whole Chomp", "Anton", "Impact", sans-serif; /* giant display words */
+  --font-moste:
+    "Moste", "Bricolage Grotesque", "Inter", sans-serif; /* page + section headings */
+  --font-romance:
+    "Young Romance", "Fraunces", Georgia, serif; /* accent words in headings */
+  --font-trufter:
+    "Trufter", "Bricolage Grotesque", "Inter", sans-serif; /* card + article titles */
+  --font-seatren:
+    "Seatren", "Bricolage Grotesque", "Inter", sans-serif; /* figures, marquee */
+  --font-star:
+    "Starplayer", "Bricolage Grotesque", "Inter", sans-serif; /* nav, buttons, chips */
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --side-space: clamp(20px, 5.25vw, 94px);
+  /* Where a sticky bar can sit without hiding under the floating header:
+     below the capsule while it shows, near the top when it hides on scroll. */
+  --header-clear: 88px;
+  --nav-height: 92px;
+  --radius: 22px;
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  --tone-duration: 900ms;
+}
+
+/* ── Tones ────────────────────────────────────────────────────────────────
+   A tone is a full colour role set. Pages mark sections with data-tone; the
+   active one is written to <html> (see hooks/useTone.js). `.tone-x` pins a
+   tone locally for an element that must not follow the page (mockups, cards).
+   Every pair below keeps body text at ≥ 4.5:1 on its background. */
+
+html[data-tone="night"],
+.tone-night {
+  --bg: #0e0929;
+  --fg: #ebf1f5;
+  --fg-2: rgba(235, 241, 245, 0.74);
+  --fg-3: rgba(235, 241, 245, 0.52);
+  --line: rgba(146, 172, 255, 0.18);
+  --card: rgba(146, 172, 255, 0.07);
+  --accent: #f3f298;
+  --accent-2: #92acff;
+  --on-accent: #0e0929;
+}
+
+html[data-tone="ink"],
+.tone-ink {
+  --bg: #010b13;
+  --fg: #dfe8e7;
+  --fg-2: rgba(223, 232, 231, 0.72);
+  --fg-3: rgba(223, 232, 231, 0.5);
+  --line: rgba(223, 232, 231, 0.13);
+  --card: rgba(146, 172, 255, 0.06);
+  --accent: #92acff;
+  --accent-2: #f3f298;
+  --on-accent: #010b13;
+}
+
+html[data-tone="indigo"],
+.tone-indigo {
+  --bg: #353a96;
+  --fg: #fcf0d6;
+  --fg-2: rgba(252, 240, 214, 0.86);
+  --fg-3: rgba(252, 240, 214, 0.66);
+  --line: rgba(252, 240, 214, 0.22);
+  --card: rgba(14, 9, 41, 0.24);
+  --accent: #f3f298;
+  --accent-2: #ffefb4;
+  --on-accent: #0e0929;
+}
+
+html[data-tone="cobalt"],
+.tone-cobalt {
+  --bg: #285ccc;
+  --fg: #ffffff;
+  --fg-2: rgba(255, 255, 255, 0.9);
+  --fg-3: rgba(255, 255, 255, 0.72);
+  --line: rgba(255, 255, 255, 0.24);
+  --card: rgba(1, 11, 19, 0.16);
+  --accent: #ffefb4;
+  --accent-2: #f3f298;
+  --on-accent: #0e0929;
+}
+
+html[data-tone="crimson"],
+.tone-crimson {
+  --bg: #b40023;
+  --fg: #fcf0d6;
+  --fg-2: rgba(252, 240, 214, 0.88);
+  --fg-3: rgba(252, 240, 214, 0.7);
+  --line: rgba(252, 240, 214, 0.24);
+  --card: rgba(14, 9, 41, 0.18);
+  --accent: #f3f298;
+  --accent-2: #ffefb4;
+  --on-accent: #b40023;
+}
+
+html[data-tone="rust"],
+.tone-rust {
+  --bg: #a0430a;
+  --fg: #fcf0d6;
+  --fg-2: rgba(252, 240, 214, 0.88);
+  --fg-3: rgba(252, 240, 214, 0.7);
+  --line: rgba(252, 240, 214, 0.24);
+  --card: rgba(1, 11, 19, 0.16);
+  --accent: #ffefb4;
+  --accent-2: #f3f298;
+  --on-accent: #a0430a;
+}
+
+html[data-tone="cream"],
+.tone-cream {
+  --bg: #fcf0d6;
+  --fg: #0e0929;
+  --fg-2: rgba(14, 9, 41, 0.76);
+  --fg-3: rgba(14, 9, 41, 0.58);
+  --line: rgba(14, 9, 41, 0.14);
+  --card: rgba(255, 255, 255, 0.5);
+  --accent: #b40023;
+  --accent-2: #353a96;
+  --on-accent: #fcf0d6;
+}
+
+html[data-tone="sand"],
+.tone-sand {
+  --bg: #f5e4d0;
+  --fg: #010b13;
+  --fg-2: rgba(1, 11, 19, 0.76);
+  --fg-3: rgba(1, 11, 19, 0.58);
+  --line: rgba(1, 11, 19, 0.14);
+  --card: rgba(255, 255, 255, 0.45);
+  --accent: #a0430a;
+  --accent-2: #353a96;
+  --on-accent: #fcf0d6;
+}
+
+html[data-tone="butter"],
+.tone-butter {
+  --bg: #ffefb4;
+  --fg: #0e0929;
+  --fg-2: rgba(14, 9, 41, 0.76);
+  --fg-3: rgba(14, 9, 41, 0.58);
+  --line: rgba(14, 9, 41, 0.15);
+  --card: rgba(255, 255, 255, 0.45);
+  --accent: #b40023;
+  --accent-2: #353a96;
+  --on-accent: #ffefb4;
+}
+
+html[data-tone="lemon"],
+.tone-lemon {
+  --bg: #f3f298;
+  --fg: #0e0929;
+  --fg-2: rgba(14, 9, 41, 0.78);
+  --fg-3: rgba(14, 9, 41, 0.6);
+  --line: rgba(14, 9, 41, 0.16);
+  --card: rgba(255, 255, 255, 0.4);
+  --accent: #353a96;
+  --accent-2: #b40023;
+  --on-accent: #f3f298;
+}
+
+html[data-tone="mist"],
+.tone-mist {
+  --bg: #ebf1f5;
+  --fg: #0e0929;
+  --fg-2: rgba(14, 9, 41, 0.74);
+  --fg-3: rgba(14, 9, 41, 0.56);
+  --line: rgba(14, 9, 41, 0.12);
+  --card: #ffffff;
+  --accent: #285ccc;
+  --accent-2: #b40023;
+  --on-accent: #ffffff;
+}
+
+html[data-tone="sage"],
+.tone-sage {
+  --bg: #dfe8e7;
+  --fg: #010b13;
+  --fg-2: rgba(1, 11, 19, 0.74);
+  --fg-3: rgba(1, 11, 19, 0.56);
+  --line: rgba(1, 11, 19, 0.13);
+  --card: rgba(255, 255, 255, 0.55);
+  --accent: #353a96;
+  --accent-2: #a0430a;
+  --on-accent: #dfe8e7;
+}
+
+/* Pinned tones also paint their own background. */
+.tone-night,
+.tone-ink,
+.tone-indigo,
+.tone-cobalt,
+.tone-crimson,
+.tone-rust,
+.tone-cream,
+.tone-sand,
+.tone-butter,
+.tone-lemon,
+.tone-mist,
+.tone-sage {
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+html {
+  transition:
+    --bg var(--tone-duration) var(--ease-out),
+    --fg var(--tone-duration) var(--ease-out),
+    --fg-2 var(--tone-duration) var(--ease-out),
+    --fg-3 var(--tone-duration) var(--ease-out),
+    --line var(--tone-duration) var(--ease-out),
+    --card var(--tone-duration) var(--ease-out),
+    --accent var(--tone-duration) var(--ease-out),
+    --accent-2 var(--tone-duration) var(--ease-out),
+    --on-accent var(--tone-duration) var(--ease-out);
+}
+
+@media (max-width: 760px) {
+  :root {
+    --side-space: 20px;
+    --nav-height: 74px;
+    --radius: 18px;
+    --header-clear: 78px;
+  }
+}
+
+html[data-nav="hidden"] {
+  --header-clear: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --tone-duration: 0ms;
+  }
+}

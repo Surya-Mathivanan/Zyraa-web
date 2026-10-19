@@ -1,0 +1,65 @@
+.sp-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.sp-head > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sp-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sp-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.sp-cols .dm-label {
+  margin-bottom: 4px;
+}
+
+.sp-formula {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--card);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--fg-2);
+}
+
+.sp-formula b {
+  color: var(--fg);
+}
+
+.sp-issues {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sp-issue {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+@media (max-width: 560px) {
+  .sp-cols {
+    grid-template-columns: 1fr;
+  }
+}

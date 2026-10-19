@@ -184,7 +184,13 @@ export default function ShatterType({ text, className = "", cols = 8, rows = 3, 
       data-cursor={burst ? "Boom" : "Shatter"}
       role="presentation"
     >
-      <Tag className="shatter-sizer">{text}</Tag>
+      {/* The real heading. The sizer below is `visibility: hidden`, which drops
+          it from the accessibility tree, and the shards are aria-hidden, so
+          without this the page would have no readable heading at all. */}
+      <Tag className="sr-only">{text}</Tag>
+      <div className="shatter-sizer" aria-hidden="true">
+        {text}
+      </div>
       <div className="shatter-layer" aria-hidden="true">
         {shards.map((shard, i) => (
           <Shard

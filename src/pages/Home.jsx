@@ -1,367 +1,557 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import FadingStars from "../components/FadingStars.jsx";
 import SignalType from "../components/SignalType.jsx";
-import ScrollCircle from "../components/ScrollCircle.jsx";
+import HeroBadges from "../components/HeroBadges.jsx";
+import Section from "../components/Section.jsx";
 import Footer from "../components/Footer.jsx";
 import Seo from "../components/Seo.jsx";
+import Btn from "../components/Btn.jsx";
+import Marquee from "../components/Marquee.jsx";
+import CountUp from "../components/CountUp.jsx";
+import StitchLine from "../components/StitchLine.jsx";
+import ScrollText from "../components/ScrollText.jsx";
+import JournalCard from "../components/JournalCard.jsx";
 import { Reveal, SplitWords } from "../components/Reveal.jsx";
+import { ArrowUpRight } from "../components/Icons.jsx";
+import { PhoneFrame, BrowserFrame } from "../components/mockups/Frames.jsx";
+import {
+  MobileHome,
+  WebDashboard,
+  AdminPayroll,
+} from "../components/mockups/Screens.jsx";
 import { site } from "../data/site.js";
-import { scrollToSelector } from "../hooks/useLenis.js";
+import { posts } from "../data/posts/index.js";
+import { judgeArrival, arrivalZones } from "../lib/rules/arrival.js";
+import { fmtTime, fmtShift, hm } from "../lib/rules/time.js";
+import { useParallax } from "../hooks/useParallax.js";
+import { useMedia, useReducedMotion } from "../hooks/useMedia.js";
 import "./home.css";
 
 const ease = [0.2, 0.8, 0.2, 1];
 
-function Arrow() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M6 18L18 6M8 6H18V16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
+/* ── Hero ─────────────────────────────────────────────────────────────── */
 function Hero() {
   const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "26%"]);
-  const fade = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
+  const contentY = useParallax(ref, ["0%", "22%"], {
+    offset: ["start start", "end start"],
+  });
+  const fade = useParallax(ref, [1, 0], {
+    offset: ["start start", "end start"],
+    input: [0, 0.8],
+  });
 
   return (
-    <section className="hero" ref={ref} id="hero">
-      <FadingStars className="hero-stars" count={120} speed={1} trail={1.1} />
-      <div className="hero-glow" aria-hidden="true" />
-      <div className="grain" />
-
-      <motion.div className="container hero-inner" style={{ y: contentY, opacity: fade }}>
-        <Reveal delay={0.1}>
-          <span className="kicker">HRMS · {site.location.city}</span>
-        </Reveal>
-
-        <h1 className="sr-only">Zyraa HRMS</h1>
-        <SignalType text="ZYRAA" className="hero-wordmark" />
-
-        <motion.p
-          className="hero-sub"
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.55, ease }}
-        >
-          {site.tagline}
-        </motion.p>
-
-        <motion.p
-          className="hero-desc"
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.68, ease }}
-        >
-          Biometric attendance, staff and production payroll, leave and permission approvals, geo on-duty
-          tracking and {site.stats.reports}+ reports. One record of the month, three ways in.
-        </motion.p>
+    <Section tone="night" className="hero" id="hero">
+      <div className="hero-track" ref={ref}>
+        <FadingStars
+          className="hero-stars"
+          count={130}
+          speed={1}
+          trail={1.15}
+        />
+        <div className="hero-glow" aria-hidden="true" />
+        <div className="grain" />
 
         <motion.div
-          className="hero-actions"
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8, ease }}
+          className="container hero-inner"
+          style={{ y: contentY, opacity: fade }}
         >
-          <Link className="pill-action" to="/features" data-cursor="Features">
-            <span className="pill">See what it does</span>
-            <span className="pill-arrow">
-              <Arrow />
-            </span>
-          </Link>
-          <a className="hero-chip" href={`tel:+${site.primaryPhone.raw}`} data-cursor="Call">
-            <span className="hero-chip-dot" aria-hidden="true" />
-            Call <span className="hero-chip-phone">{site.primaryPhone.label}</span>
-          </a>
-          <a
-            className="hero-chip"
-            href={`https://wa.me/${site.primaryPhone.raw}`}
-            target="_blank"
-            rel="noreferrer noopener"
-            data-cursor="Chat"
-          >
-            <span className="hero-chip-dot" aria-hidden="true" />
-            WhatsApp
-          </a>
-        </motion.div>
+          <HeroBadges city={site.location.city} />
 
-        <motion.div
-          className="hero-meta"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.9, delay: 0.95 }}
-        >
-          <span>{site.stats.modules} modules</span>
-          <span>{site.stats.surfaces} apps</span>
-          <span>{site.stats.approvalTypes} approval pipelines</span>
-          <span>{site.stats.reports}+ reports</span>
-        </motion.div>
-      </motion.div>
+          <h1 className="sr-only">Zyraa HRMS - {site.tagline}</h1>
 
-      <div className="hero-scroll">
-        <ScrollCircle onClick={() => scrollToSelector("#intro")} />
+          {/* The wordmark sets the width; everything under it spans exactly
+              from the Z to the last A, so both edges line up. */}
+          <div className="hero-lockup">
+            <SignalType text="ZYRAA" className="hero-wordmark" />
+
+            <div className="hero-lower">
+              <motion.p
+                className="hero-sub"
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.9, delay: 0.6, ease }}
+              >
+                One record of the month -{" "}
+                <em className="accent-word">from the punch</em> to the payslip.
+              </motion.p>
+
+              <motion.div
+                className="hero-side"
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.9, delay: 0.78, ease }}
+              >
+                <p className="hero-desc">
+                  Biometric attendance, shift rules, approvals, staff and
+                  production payroll, gate passes and {site.stats.reports}+
+                  reports - for the office that closes monthly and the floor
+                  that closes weekly.
+                </p>
+                {/* Phones show the short labels so the two buttons can sit
+                    side by side; aria-label keeps the full wording. */}
+                <div className="btn-row hero-actions">
+                  <Btn to="/demos" solid cursor="Play" aria-label="Try the live demos">
+                    <span className="label-long">Try the live demos</span>
+                    <span className="label-short">Live demos</span>
+                  </Btn>
+                  <Btn to="/features" cursor="Features" aria-label="See every feature">
+                    <span className="label-long">See every feature</span>
+                    <span className="label-short">All features</span>
+                  </Btn>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </motion.div>
       </div>
-    </section>
+    </Section>
   );
 }
 
-function Intro() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const ghostX = useTransform(scrollYProgress, [0, 1], ["5%", "-12%"]);
-
-  const stats = [
-    { value: `${site.stats.reports}+`, label: "Ready-made reports for compliance and oversight" },
-    { value: site.stats.approvalTypes, label: "Approval pipelines, each with its own route and audit trail" },
-    { value: site.stats.surfaces, label: "Apps: admin portal, employee web and mobile" },
-    { value: "1", label: "Record of the month. Payroll reads it rather than rebuilding it" },
+/* ── The problem ──────────────────────────────────────────────────────── */
+function Problem() {
+  const steps = [
+    {
+      n: "01",
+      t: "The punch",
+      d: "Face terminals, geo-fenced phones and on-duty photos feed one record.",
+    },
+    {
+      n: "02",
+      t: "The rule",
+      d: "Late windows, permissions and shift ladders judge each day - with a reason.",
+    },
+    {
+      n: "03",
+      t: "The approval",
+      d: "Requests move through HOD and HR pipelines, inside an open window.",
+    },
+    {
+      n: "04",
+      t: "The payslip",
+      d: "Payroll reads the month. Nothing is typed in twice, so nothing drifts.",
+    },
   ];
-
   return (
-    <section className="intro" id="intro" ref={ref}>
-      <motion.div className="intro-ghost" style={{ x: ghostX }} aria-hidden="true">
-        ATTENDANCE · PAYROLL · PEOPLE
-      </motion.div>
-      <div className="container intro-grid">
-        <div className="intro-left">
+    <Section tone="cream" className="section problem" id="problem">
+      <div className="container problem-grid">
+        <div className="problem-side">
           <Reveal>
-            <span className="kicker">What Zyraa is</span>
+            <span className="kicker">The problem</span>
           </Reveal>
-          <SplitWords
-            as="h2"
-            className="intro-title"
-            text="Salary is calculated from the attendance already in the system."
-            delay={0.1}
-          />
-        </div>
-        <div className="intro-right">
-          <Reveal delay={0.15}>
-            <p className="intro-text">
-              In most units the month is assembled twice: once as attendance, then again at month end as a
-              salary sheet. Every disagreement lives in that second pass. Zyraa keeps one record — punches,
-              leave, permissions, late deductions and advance EMIs — and payroll reads it. Nothing is
-              re-entered, so nothing drifts.
+          <Reveal delay={0.1}>
+            <p className="problem-note">
+              Every argument at the pay counter starts in the same place.
             </p>
           </Reveal>
-          <Reveal delay={0.25}>
-            <Link className="pill-action" to="/features" data-cursor="Modules">
-              <span className="pill">Browse the modules</span>
-              <span className="pill-arrow">
-                <Arrow />
-              </span>
-            </Link>
-          </Reveal>
         </div>
+        <ScrollText
+          className="problem-text"
+          text="In most units the month is assembled *twice* - once as punches, once more at month end as a salary sheet someone types by hand. Two records of the same month always drift apart. Zyraa keeps *one record* and payroll reads it."
+        />
       </div>
-
-      <div className="container stats">
-        {stats.map((s, i) => (
-          <Reveal key={s.label} delay={i * 0.1} className="stat">
-            <div className="stat-value">{s.value}</div>
-            <div className="stat-label">{s.label}</div>
+      <div className="container problem-steps">
+        {steps.map((s, i) => (
+          <Reveal key={s.n} delay={i * 0.08} className="problem-step">
+            <span className="problem-step-n">{s.n}</span>
+            <h3 className="h3">{s.t}</h3>
+            <p>{s.d}</p>
           </Reveal>
         ))}
       </div>
-    </section>
+    </Section>
   );
 }
 
-function Marquee() {
-  const items = [
-    "Biometric attendance",
-    "Staff payroll",
-    "Production payroll",
-    "Leave & permissions",
-    "Geo on-duty",
-    "Advances",
-    "MD portal",
-  ];
-  const track = [...items, ...items];
+/* ── Three apps (horizontal scroll on desktop) ───────────────────────── */
+const APP_SCREENS = {
+  admin: () => (
+    <BrowserFrame url="hr.zyraa / payroll">
+      <AdminPayroll />
+    </BrowserFrame>
+  ),
+  web: () => (
+    <BrowserFrame url="my.zyraa / dashboard">
+      <WebDashboard />
+    </BrowserFrame>
+  ),
+  mobile: () => (
+    <PhoneFrame>
+      <MobileHome />
+    </PhoneFrame>
+  ),
+};
+
+function AppPanel({ app }) {
+  const Screen = APP_SCREENS[app.id];
   return (
-    <div className="marquee home-marquee" aria-hidden="true">
-      <div className="marquee-track">
-        {track.map((item, i) => (
-          <span key={i}>
-            {item} <i>✦</i>
-          </span>
+    <article className={`app-panel app-panel--${app.id}`}>
+      <div className="app-panel-copy">
+        <span className="app-panel-code figure">{app.code}</span>
+        <h3 className="app-panel-name">{app.name}</h3>
+        <span className="chip">{app.who}</span>
+        <p>{app.blurb}</p>
+        <ul className="dot-list">
+          {app.points.map((p) => (
+            <li key={p}>{p}</li>
+          ))}
+        </ul>
+      </div>
+      <div className="app-panel-screen">
+        <Screen />
+      </div>
+    </article>
+  );
+}
+
+function Apps() {
+  const ref = useRef(null);
+  const wide = useMedia("(min-width: 1000px)");
+  const reduced = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start start", "end end"],
+  });
+  const smooth = useSpring(scrollYProgress, {
+    stiffness: 140,
+    damping: 30,
+    mass: 0.3,
+  });
+  // Four panels with a hold on each, so every app rests centred for a stretch
+  // of scrolling before the next one slides in.
+  const x = useTransform(
+    smooth,
+    [0, 0.1, 0.3, 0.4, 0.6, 0.7, 0.9, 1],
+    ["0%", "0%", "-25%", "-25%", "-50%", "-50%", "-75%", "-75%"],
+  );
+  const bar = useTransform(smooth, [0, 1], [0, 1]);
+  const horizontal = wide && !reduced;
+
+  return (
+    <Section
+      tone="indigo"
+      className={`apps ${horizontal ? "apps--h" : ""}`}
+      id="apps"
+    >
+      <div ref={ref} className="apps-track">
+        <div className="apps-sticky">
+          <motion.div
+            className="apps-rail"
+            style={horizontal ? { x } : undefined}
+          >
+            <div className="apps-intro">
+              <span className="kicker">Three ways in</span>
+              <SplitWords
+                as="h2"
+                className="h1"
+                text="One system. Three apps."
+                accent="Three apps."
+              />
+              <p className="lede">
+                HR runs the month from the admin portal. Employees check their
+                own month in the browser. Anything that needs a location, a
+                camera or the gate happens on the phone - including approvals.
+              </p>
+              <Btn to="/apps" cursor="Apps">
+                Tour the apps
+              </Btn>
+            </div>
+            {site.apps.map((app) => (
+              <AppPanel key={app.id} app={app} />
+            ))}
+          </motion.div>
+          {horizontal && (
+            <div className="apps-progress" aria-hidden="true">
+              <motion.span style={{ scaleX: bar }} />
+            </div>
+          )}
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+/* ── Numbers ──────────────────────────────────────────────────────────── */
+function Numbers() {
+  const items = [
+    {
+      v: site.stats.reports,
+      s: "+",
+      l: "ready-made reports, every one to Excel and PDF",
+    },
+    {
+      v: site.stats.requestTypes,
+      l: "request types, each with its own approval pipeline",
+    },
+    { v: 3, d: 2, l: "shifts a production worker can earn in one day" },
+    {
+      v: site.stats.reportCategories,
+      l: "report categories, from muster roll to MD brief",
+    },
+    {
+      v: site.stats.aiTools,
+      s: "+",
+      l: "read-only analytics tools behind the MD assistant",
+    },
+    {
+      v: site.stats.payCycles,
+      l: "pay cycles side by side: weekly, bi-weekly, monthly",
+    },
+  ];
+  return (
+    <Section tone="ink" className="section numbers">
+      <div className="container">
+        <div className="numbers-head">
+          <span className="kicker">By the numbers</span>
+          <SplitWords
+            as="h2"
+            className="h2"
+            text="Built for the whole factory, not just the office."
+            accent="whole factory,"
+          />
+        </div>
+        <div className="numbers-grid">
+          {items.map((it, i) => (
+            <Reveal key={it.l} delay={(i % 3) * 0.08} className="number">
+              <CountUp
+                className="number-value figure"
+                value={it.v}
+                decimals={it.d || 0}
+                suffix={it.s || ""}
+              />
+              <p>{it.l}</p>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+/* ── Arrival mini-demo ────────────────────────────────────────────────── */
+function ArrivalMini() {
+  const [t, setT] = useState(hm(9, 35));
+  const verdict = judgeArrival(t, { permission: false });
+  const zones = arrivalZones();
+  const min = hm(8, 30);
+  const max = hm(13);
+  const pct = (v) => ((v - min) / (max - min)) * 100;
+  return (
+    <div className="mini card">
+      <div className="mini-head">
+        <span className="kicker">Drag the first punch</span>
+        <span className="mini-time figure">{fmtTime(t)}</span>
+      </div>
+      <div className="mini-track">
+        {zones.slice(0, 5).map((z) => (
+          <span
+            key={z.id}
+            className={`mini-zone mini-zone--${z.id} ${verdict.zone === z.id ? "is-on" : ""}`}
+            style={{
+              left: `${Math.max(0, pct(z.from))}%`,
+              width: `${Math.min(100, pct(z.to)) - Math.max(0, pct(z.from))}%`,
+            }}
+          />
         ))}
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={1}
+          value={t}
+          onChange={(e) => setT(Number(e.target.value))}
+          aria-label="First punch time"
+        />
+      </div>
+      <div className="mini-out">
+        <span className="figure mini-value">{fmtShift(verdict.value)}</span>
+        <p>{verdict.reason}</p>
       </div>
     </div>
   );
 }
 
-function Surfaces() {
-  return (
-    <section className="surfaces">
-      <div className="container surfaces-head">
-        <Reveal>
-          <span className="kicker">Three ways in</span>
-        </Reveal>
-        <SplitWords as="h2" className="surfaces-title" text="One system. Three apps." delay={0.05} />
-        <Reveal delay={0.2}>
-          <p className="surfaces-text">
-            HR runs the month from the admin portal. Employees check their own data from the browser or the
-            phone. Department heads approve from wherever they are standing.
-          </p>
-        </Reveal>
-      </div>
-      <div className="container surfaces-grid">
-        {site.surfaces.map((s, i) => (
-          <Reveal key={s.id} delay={i * 0.1} className="surface-card">
-            <div className="surface-card-top">
-              <span className="surface-code">{s.code}</span>
-              <span className="surface-who">{s.who}</span>
-            </div>
-            <h3>{s.name}</h3>
-            <p>{s.blurb}</p>
-          </Reveal>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function ModuleCard({ module: m, index }) {
-  const ref = useRef(null);
-  const glowX = useMotionValue(50);
-  const glowY = useMotionValue(50);
-  const rx = useMotionValue(0);
-  const ry = useMotionValue(0);
-  const srx = useSpring(rx, { stiffness: 160, damping: 18 });
-  const sry = useSpring(ry, { stiffness: 160, damping: 18 });
-  const glow = useTransform(
-    [glowX, glowY],
-    ([x, y]) => `radial-gradient(420px circle at ${x}% ${y}%, rgba(139, 124, 255, 0.16), transparent 62%)`
-  );
-
-  const onMove = (e) => {
-    const r = ref.current.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width;
-    const py = (e.clientY - r.top) / r.height;
-    ry.set((px - 0.5) * 9);
-    rx.set((0.5 - py) * 9);
-    glowX.set(px * 100);
-    glowY.set(py * 100);
-  };
-  const onLeave = () => {
-    rx.set(0);
-    ry.set(0);
-  };
-
-  return (
-    <Reveal delay={index * 0.07} className="module-card-wrap">
-      <motion.div
-        ref={ref}
-        className="module-card"
-        style={{ rotateX: srx, rotateY: sry, transformPerspective: 1000 }}
-        onMouseMove={onMove}
-        onMouseLeave={onLeave}
-      >
-        <motion.div className="module-card-glow" style={{ background: glow }} aria-hidden="true" />
-        <div className="module-card-top">
-          <span className="module-code">{m.code}</span>
-          <span className="module-short">{m.short}</span>
-        </div>
-        <h3 className="module-name">{m.name}</h3>
-        <p className="module-blurb">{m.blurb}</p>
-        <Link className="module-link" to={`/features#${m.id}`} data-cursor="Open">
-          See details <Arrow />
-        </Link>
-      </motion.div>
-    </Reveal>
-  );
-}
-
-function Modules() {
-  return (
-    <section className="home-modules">
-      <div className="container home-modules-head">
-        <Reveal>
-          <span className="kicker">Modules</span>
-        </Reveal>
-        <SplitWords as="h2" className="home-modules-title" text="Everything the month needs." delay={0.05} />
-      </div>
-      <div className="container module-grid">
-        {site.modules.map((m, i) => (
-          <ModuleCard key={m.id} module={m} index={i} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function Flow() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const lineScale = useTransform(scrollYProgress, [0.1, 0.75], [0, 1]);
-
-  const steps = [
-    { n: "01", t: "The punch", d: "Biometric devices on the factory network sync into Zyraa, in Strict or Simple mode." },
-    { n: "02", t: "The request", d: "Leave, permissions and missing-punch claims are raised from the mobile app, for the current month." },
-    { n: "03", t: "The approval", d: "Employee to department head to HR. Seven pipelines, every action logged with who, when and why." },
-    { n: "04", t: "The payroll", d: "Draft, review, publish, lock. LOP, late slabs, PF, ESI and EMIs are already attached to the month." },
+function DemoTeaser() {
+  const demos = [
+    ["arrival-timeline", "Arrival timeline", "Five zones, one reason sentence"],
+    ["production-day", "Try a production day", "Shifts earned by the minute"],
+    ["approvals", "Approval pipeline", "HOD, HR, or whoever is first"],
+    ["staff-payroll", "Payslip builder", "From the month to net pay"],
+    ["geo-on-duty", "Geo punch & on-duty", "Inside the fence, or not"],
+    ["report-center", "Report Center", "Search all 148 reports"],
   ];
-
   return (
-    <section className="flow" ref={ref}>
-      <div className="container flow-head">
-        <Reveal>
-          <span className="kicker">How a month closes</span>
-        </Reveal>
-        <SplitWords as="h2" className="flow-title" text="From the punch to the payslip." delay={0.05} />
+    <Section tone="mist" className="section demo-teaser">
+      <div className="container demo-teaser-grid">
+        <div>
+          <span className="kicker">Live demos</span>
+          <SplitWords
+            as="h2"
+            className="h2"
+            text="Don't read about the rules. Play with them."
+            accent="Play with them."
+          />
+          <p className="lede">
+            Every demo runs the same rules the product ships with - the late
+            window, the quarter-shift, the production ladder, the request
+            window. Change an input and watch the verdict change.
+          </p>
+          <ArrivalMini />
+        </div>
+        <div className="demo-teaser-list">
+          {demos.map(([slug, t, d], i) => (
+            <Reveal key={slug} delay={i * 0.05}>
+              <Link
+                to={`/demos/${slug}`}
+                className="demo-teaser-link"
+                data-cursor="Play"
+              >
+                <span className="demo-teaser-n">0{i + 1}</span>
+                <span className="demo-teaser-t">
+                  <strong>{t}</strong>
+                  <small>{d}</small>
+                </span>
+                <ArrowUpRight />
+              </Link>
+            </Reveal>
+          ))}
+          <Btn to="/demos" solid cursor="Demos">
+            All demos
+          </Btn>
+        </div>
       </div>
-      <div className="container flow-track">
-        <motion.span className="flow-line" style={{ scaleY: lineScale }} aria-hidden="true" />
-        <ul className="flow-list">
+    </Section>
+  );
+}
+
+/* ── Flow ─────────────────────────────────────────────────────────────── */
+function Flow() {
+  const steps = [
+    {
+      t: "Punch",
+      d: "Face terminal, geo punch or on-duty photo. Two taps inside 5 minutes count once.",
+    },
+    {
+      t: "Judge",
+      d: "The shift's windows decide the day - and write the reason in plain words.",
+    },
+    {
+      t: "Request",
+      d: "Missed punch? Permission? Raised from the phone, inside the open window.",
+    },
+    {
+      t: "Approve",
+      d: "Department head, then HR - or whoever acts first. Every step on the trail.",
+    },
+    {
+      t: "Pay",
+      d: "Generate, review each priced issue, mark paid. Slips go out by PDF, email or WhatsApp.",
+    },
+  ];
+  return (
+    <Section tone="butter" className="section flow">
+      <div className="container flow-head">
+        <span className="kicker">How a month closes</span>
+        <SplitWords
+          as="h2"
+          className="h1"
+          text="From the punch to the payslip."
+          accent="payslip."
+        />
+      </div>
+      <div className="container flow-body">
+        <StitchLine d="M60 0 C 60 160, 940 140, 940 300 S 60 460, 60 620 S 940 780, 940 1000" />
+        <ol className="flow-list">
           {steps.map((s, i) => (
-            <Reveal key={s.n} as="li" delay={i * 0.1} className="flow-item">
-              <span className="flow-n">{s.n}</span>
+            <Reveal
+              as="li"
+              key={s.t}
+              delay={0.05}
+              className={`flow-step ${i % 2 ? "flow-step--r" : ""}`}
+            >
+              <span className="flow-step-n figure">0{i + 1}</span>
               <div>
-                <h3>{s.t}</h3>
+                <h3 className="flow-step-t">{s.t}</h3>
                 <p>{s.d}</p>
               </div>
             </Reveal>
           ))}
-        </ul>
+        </ol>
       </div>
-    </section>
+    </Section>
   );
 }
 
-function CTA() {
+/* ── Pillars ──────────────────────────────────────────────────────────── */
+function Pillars() {
   return (
-    <section className="home-cta">
-      <FadingStars className="home-cta-stars" count={70} speed={0.85} trail={1.3} opacity={0.85} />
-      <div className="home-cta-fade" aria-hidden="true" />
-      <div className="container home-cta-inner">
-        <Reveal>
-          <span className="kicker">Next step</span>
-        </Reveal>
-        <SplitWords as="h2" className="home-cta-title" text="Bring one month of attendance." delay={0.05} />
-        <Reveal delay={0.25}>
-          <p className="home-cta-text">
-            The fastest way to judge Zyraa is to run a month you already know the answer to. Call and we will
-            set it up.
-          </p>
-        </Reveal>
-        <Reveal delay={0.3}>
-          <a className="home-cta-phone" href={`tel:+${site.primaryPhone.raw}`} data-cursor="Call">
-            {site.primaryPhone.label}
-          </a>
-        </Reveal>
-        <Reveal delay={0.35}>
-          <Link className="pill-action" to="/contact" data-cursor="Demo">
-            <span className="pill">Book a demo</span>
-            <span className="pill-arrow">
-              <Arrow />
-            </span>
-          </Link>
-        </Reveal>
+    <Section tone="sage" className="section pillars">
+      <div className="container">
+        <div className="pillars-head">
+          <span className="kicker">Everything the month needs</span>
+          <SplitWords
+            as="h2"
+            className="h2"
+            text="Five pillars, one record."
+            accent="one record."
+          />
+        </div>
+        <div className="pillars-grid">
+          {site.pillars.map((p, i) => (
+            <Reveal key={p.id} delay={i * 0.06}>
+              <Link
+                to={`/features#${p.id}`}
+                className={`pillar tone-${p.tone}`}
+                data-cursor="Open"
+              >
+                <span className="pillar-n figure">0{i + 1}</span>
+                <span className="pillar-name">{p.name}</span>
+                <span className="pillar-title">{p.title}</span>
+                <ul>
+                  {p.modules.map((m) => (
+                    <li key={m.id}>{m.name}</li>
+                  ))}
+                </ul>
+                <ArrowUpRight className="pillar-arrow" />
+              </Link>
+            </Reveal>
+          ))}
+        </div>
       </div>
-    </section>
+    </Section>
+  );
+}
+
+/* ── Journal ──────────────────────────────────────────────────────────── */
+function Journal() {
+  const latest = posts.slice(0, 3);
+  return (
+    <Section tone="sand" className="section journal">
+      <div className="container">
+        <div className="journal-head">
+          <div>
+            <span className="kicker">The journal</span>
+            <SplitWords
+              as="h2"
+              className="h2"
+              text="Notes from the floor."
+              accent="the floor."
+            />
+          </div>
+          <Btn to="/blogs" cursor="Read">
+            All articles
+          </Btn>
+        </div>
+        <div className="journal-grid">
+          {latest.map((p, i) => (
+            <JournalCard key={p.slug} post={p} delay={i * 0.08} />
+          ))}
+        </div>
+      </div>
+    </Section>
   );
 }
 
@@ -370,15 +560,30 @@ export default function Home() {
     <main className="page home">
       <Seo
         path="/"
-        description="Zyraa is an HRMS for manufacturing units: biometric attendance, staff and production payroll, leave and permission approvals, geo on-duty and 140+ reports."
+        description="Zyraa is the HRMS built for garment and knitwear units: biometric attendance, shift rules, approvals, staff and production payroll, gate passes and 140+ reports."
       />
       <Hero />
-      <Intro />
-      <Marquee />
-      <Surfaces />
-      <Modules />
+      <Section tone="night" as="div" className="home-marquee">
+        <Marquee
+          items={[
+            "Biometric attendance",
+            "Production pay",
+            "Approvals",
+            "Gate passes",
+            "Geo on-duty",
+            "Payslips",
+            "140+ reports",
+            "MD portal",
+          ]}
+        />
+      </Section>
+      <Problem />
+      <Apps />
+      <Numbers />
       <Flow />
-      <CTA />
+      <Pillars />
+      <DemoTeaser />
+      <Journal />
       <Footer />
     </main>
   );

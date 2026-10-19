@@ -1,0 +1,278 @@
+/* ───────────── Hero: three devices in parallax depth ───────────── */
+.apps-hero-inner {
+  position: relative;
+  min-height: 150svh;
+  overflow: hidden;
+  padding: calc(var(--nav-height) + 60px) 0 120px;
+}
+
+.apps-hero-copy {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 22px;
+  max-width: 900px;
+}
+
+.apps-hero-stage {
+  position: relative;
+  z-index: 3;
+  height: 80svh;
+  margin-top: 60px;
+  padding: 0 var(--side-space);
+}
+
+.apps-hero-back,
+.apps-hero-mid,
+.apps-hero-front {
+  position: absolute;
+}
+
+.apps-hero-back {
+  left: var(--side-space);
+  top: 0;
+  width: min(58%, 820px);
+  opacity: 0.75;
+  transform: rotate(-4deg);
+}
+
+.apps-hero-mid {
+  right: var(--side-space);
+  top: 14%;
+  width: min(54%, 760px);
+}
+
+.apps-hero-front {
+  left: 42%;
+  top: 30%;
+}
+
+/* ───────────── App sections ───────────── */
+.app-sec {
+  padding: clamp(90px, 11vw, 170px) 0;
+}
+
+.app-sec-top {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.8fr) 1.2fr;
+  align-items: center;
+  gap: clamp(32px, 5vw, 90px);
+}
+
+.app-sec-top--flip .app-sec-copy {
+  order: 2;
+}
+
+.app-sec-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.app-sec-code {
+  font-size: clamp(110px, 14vw, 240px);
+  color: var(--accent);
+  line-height: 0.8;
+}
+
+.app-sec-visual {
+  display: flex;
+  justify-content: center;
+}
+
+.app-sec-browser {
+  transition: transform 900ms var(--ease-out);
+}
+
+.app-sec-visual:hover .app-sec-browser {
+  transform: translateY(-8px) scale(1.01);
+}
+
+.app-sec-phones {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.app-sec-phones .phone {
+  width: min(250px, 30vw);
+  transition: transform 700ms var(--ease-out);
+}
+
+.app-sec-phones .phone:nth-child(1) {
+  transform: rotate(-9deg) translate(30px, 30px);
+}
+
+.app-sec-phones .phone:nth-child(2) {
+  z-index: 2;
+}
+
+.app-sec-phones .phone:nth-child(3) {
+  transform: rotate(9deg) translate(-30px, 30px);
+}
+
+.app-sec-phones:hover .phone:nth-child(1) {
+  transform: rotate(-4deg) translate(-10px, 10px);
+}
+
+.app-sec-phones:hover .phone:nth-child(3) {
+  transform: rotate(4deg) translate(10px, 10px);
+}
+
+.app-sec-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: clamp(56px, 7vw, 100px);
+}
+
+.app-sec-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  transition: border-color 400ms ease, transform 500ms var(--ease-out);
+}
+
+.app-sec-item:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+}
+
+.app-sec-item p {
+  color: var(--fg-2);
+  font-size: 15px;
+}
+
+/* ───────────── Extras ───────────── */
+.apps-extras-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: clamp(36px, 5vw, 90px);
+  align-items: center;
+}
+
+.apps-extras-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 22px;
+}
+
+.apps-extras-list {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+}
+
+.apps-extra {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.apps-extra p {
+  margin-top: 6px;
+  color: var(--fg-2);
+}
+
+/* ───────────── Sign-in ───────────── */
+.apps-signin-head {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 900px;
+}
+
+.apps-signin-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: clamp(40px, 5vw, 70px);
+}
+
+.apps-signin-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 28px;
+  border-radius: var(--radius);
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+
+.apps-signin-card .figure {
+  font-size: 48px;
+  color: var(--accent);
+}
+
+.apps-signin-card p {
+  color: var(--fg-2);
+}
+
+@media (max-width: 1000px) {
+  .app-sec-top,
+  .apps-extras-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .app-sec-top--flip .app-sec-copy {
+    order: 0;
+  }
+
+  .app-sec-grid,
+  .apps-signin-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .apps-hero-inner {
+    min-height: auto;
+  }
+
+  .apps-hero-stage {
+    height: 70vw;
+  }
+
+  .apps-hero-back {
+    width: 70%;
+  }
+
+  .apps-hero-mid {
+    width: 66%;
+  }
+
+  .apps-hero-front {
+    left: auto;
+    right: 6%;
+    top: 26%;
+  }
+
+  .apps-hero-front .phone {
+    width: 34vw;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-sec-grid,
+  .apps-signin-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .app-sec-phones .phone {
+    width: 40vw;
+  }
+
+  .app-sec-phones .phone:nth-child(1),
+  .app-sec-phones .phone:nth-child(3) {
+    display: none;
+  }
+
+  .apps-hero-stage {
+    height: 110vw;
+  }
+}

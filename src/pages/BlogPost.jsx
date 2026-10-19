@@ -1,126 +1,177 @@
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { motion, useScroll, useSpring } from "framer-motion";
+import Section from "../components/Section.jsx";
 import Footer from "../components/Footer.jsx";
 import Seo from "../components/Seo.jsx";
-import { Reveal, SplitWords } from "../components/Reveal.jsx";
-import { site } from "../data/site.js";
+import Btn from "../components/Btn.jsx";
+import { Reveal } from "../components/Reveal.jsx";
+import { posts } from "../data/posts/index.js";
 import { formatDate } from "../lib/date.js";
+import AccentTitle from "../components/AccentTitle.jsx";
+import PostCover, { CategoryIcon } from "../components/PostCover.jsx";
+import JournalCard from "../components/JournalCard.jsx";
+import { categoryOf } from "../data/categories.js";
+import NotFound from "./NotFound.jsx";
 import "./blogs.css";
 
-function Arrow() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M6 18L18 6M8 6H18V16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
+// Article bodies load on demand, one small chunk per post.
+const bodies = import.meta.glob("../data/posts/*.js", { import: "default" });
+
+/** **bold** and *italic* inside a block's text. */
+function Rich({ text }) {
+  return text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/).map((part, i) => {
+    if (part.startsWith("**")) return <strong key={i}>{part.slice(2, -2)}</strong>;
+    if (part.startsWith("*") && part.length > 2) return <em key={i}>{part.slice(1, -1)}</em>;
+    return part;
+  });
+}
+
+function Block({ b }) {
+  switch (b.type) {
+    case "h2":
+      return <h2 className="ps-h2">{b.text}</h2>;
+    case "list":
+      return (
+        <ul className="ps-list">
+          {b.items.map((it) => (
+            <li key={it}>
+              <Rich text={it} />
+            </li>
+          ))}
+        </ul>
+      );
+    case "steps":
+      return (
+        <ol className="ps-steps">
+          {b.items.map((it, i) => (
+            <li key={it.title}>
+              <span className="figure">{String(i + 1).padStart(2, "0")}</span>
+              <div>
+                <strong>{it.title}</strong>
+                <p>
+                  <Rich text={it.text} />
+                </p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      );
+    case "quote":
+      return (
+        <blockquote className="ps-quote">
+          <p>
+            <Rich text={b.text} />
+          </p>
+          {b.cite && <cite>{b.cite}</cite>}
+        </blockquote>
+      );
+    case "callout":
+      return (
+        <aside className="ps-callout">
+          <span className="kicker">{b.title}</span>
+          <p>
+            <Rich text={b.text} />
+          </p>
+        </aside>
+      );
+    case "figure":
+      return (
+        <figure className="ps-figure">
+          <span className="figure">{b.value}</span>
+          <figcaption>{b.label}</figcaption>
+        </figure>
+      );
+    default:
+      return (
+        <p className="ps-p">
+          <Rich text={b.text} />
+        </p>
+      );
+  }
 }
 
 export default function BlogPost() {
   const { slug } = useParams();
-  const posts = site.posts ?? [];
   const post = posts.find((p) => p.slug === slug);
+  const [blocks, setBlocks] = useState(null);
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 200, damping: 40 });
 
-  if (!post) {
-    return (
-      <main className="page blogs">
-        <Seo title="Article not found" path={`/blogs/${slug ?? ""}`} description="That article does not exist." noindex />
-        <section className="post-missing">
-          <div className="container post-missing-inner">
-            <Reveal>
-              <span className="kicker">Error 404</span>
-            </Reveal>
-            <SplitWords as="h1" className="post-missing-title" text="That article doesn't exist." delay={0.05} />
-            <Reveal delay={0.2}>
-              <p className="post-missing-text">The link may be out of date. Everything we have published is on the blog index.</p>
-            </Reveal>
-            <Reveal delay={0.28}>
-              <Link className="pill-action" to="/blogs" data-cursor="Blogs">
-                <span className="pill">All articles</span>
-                <span className="pill-arrow">
-                  <Arrow />
-                </span>
-              </Link>
-            </Reveal>
-          </div>
-        </section>
-        <Footer />
-      </main>
-    );
-  }
+  useEffect(() => {
+    const load = post && bodies[`../data/posts/${post.slug}.js`];
+    if (!load) return undefined;
+    let live = true;
+    load().then((b) => live && setBlocks(b));
+    return () => {
+      live = false;
+    };
+  }, [post]);
 
-  const others = posts.filter((p) => p.slug !== post.slug).slice(0, 2);
+  if (!post) return <NotFound />;
+
+  const i = posts.indexOf(post);
+  const others = [posts[(i + 1) % posts.length], posts[(i + 2) % posts.length]];
 
   return (
-    <main className="page blogs">
+    <main className="page post">
       <Seo title={post.title} path={`/blogs/${post.slug}`} description={post.excerpt} />
+      <motion.div className="ps-progress" style={{ scaleX: progress }} aria-hidden="true" />
 
-      <article className="post">
-        <header className="post-head">
-          <div className="container post-head-inner">
-            <Reveal>
-              <Link className="post-back" to="/blogs" data-cursor="Back">
-                ← All articles
-              </Link>
-            </Reveal>
-            <Reveal delay={0.06}>
-              <span className="kicker">
-                {post.category} · {formatDate(post.date)} · {post.readMins} min read
-              </span>
-            </Reveal>
-            <SplitWords as="h1" className="post-title" text={post.title} delay={0.1} stagger={0.045} />
-            <Reveal delay={0.3}>
-              <p className="post-lede">{post.excerpt}</p>
-            </Reveal>
-          </div>
-        </header>
+      <Section tone={post.tone} className="ps-head">
+        <div className="container ps-narrow">
+          <Reveal>
+            <Link to="/blogs" className="back-link" data-cursor="Back">
+              ← The journal
+            </Link>
+          </Reveal>
+          <Reveal delay={0.05} className="ps-meta">
+            <span className="ps-cat" style={{ "--cat": categoryOf(post.category).ink }}>
+              <CategoryIcon name={post.category} />
+              {post.category}
+            </span>
+            <span>
+              {formatDate(post.date)} · {post.readMins} min read · by Surya
+            </span>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <h1 className="ps-title">
+              <AccentTitle title={post.title} accent={post.accent} />
+            </h1>
+          </Reveal>
+          <Reveal delay={0.2}>
+            <p className="ps-lede">{post.excerpt}</p>
+          </Reveal>
+          <Reveal delay={0.28} className="ps-cover-wrap is-hover-art">
+            <PostCover post={post} showMeta={false} className="ps-cover" />
+          </Reveal>
+        </div>
+      </Section>
 
-        <div className="container post-body">
-          {post.body?.map((para, i) => (
-            <Reveal key={i} delay={0.05 + i * 0.05}>
-              <p>{para}</p>
-            </Reveal>
+      <Section tone={post.tone} as="article" className="ps-body">
+        <div className="container ps-narrow">
+          {!blocks && <p className="dm-loading">Loading the article…</p>}
+          {blocks?.map((b, k) => (
+            <Block key={k} b={b} />
           ))}
         </div>
+      </Section>
 
-        <div className="container post-foot">
-          <Reveal className="post-foot-cta">
-            <div>
-              <span className="kicker">Next step</span>
-              <h2>Seeing this on your floor?</h2>
-            </div>
-            <div className="post-foot-actions">
-              <a className="post-foot-phone" href={`tel:+${site.primaryPhone.raw}`} data-cursor="Call">
-                {site.primaryPhone.label}
-              </a>
-              <Link className="pill-action" to="/contact" data-cursor="Contact">
-                <span className="pill">Get in touch</span>
-                <span className="pill-arrow">
-                  <Arrow />
-                </span>
-              </Link>
-            </div>
-          </Reveal>
-
-          {others.length > 0 && (
-            <div className="post-more">
-              <span className="kicker">Keep reading</span>
-              <div className="post-more-grid">
-                {others.map((o, i) => (
-                  <Reveal key={o.slug} delay={i * 0.08}>
-                    <Link to={`/blogs/${o.slug}`} className="post-more-card" data-cursor="Read">
-                      <span className="post-more-cat">{o.category}</span>
-                      <strong>{o.title}</strong>
-                      <span className="post-more-link">
-                        Read <Arrow />
-                      </span>
-                    </Link>
-                  </Reveal>
-                ))}
-              </div>
-            </div>
-          )}
+      <Section tone="night" className="section ps-more">
+        <div className="container">
+          <div className="ps-more-head">
+            <span className="kicker">Keep reading</span>
+            <Btn to="/demos" cursor="Play">
+              Or try the live demos
+            </Btn>
+          </div>
+          <div className="ps-more-grid">
+            {others.map((o, k) => (
+              <JournalCard key={o.slug} post={o} delay={k * 0.08} />
+            ))}
+          </div>
         </div>
-      </article>
-
+      </Section>
       <Footer />
     </main>
   );

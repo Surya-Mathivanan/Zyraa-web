@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useReducedMotion } from "../hooks/useMedia.js";
 
 /**
- * Fading Stars — stars rising from beyond the frame on trails that fade behind
+ * Fading Stars - stars rising from beyond the frame on trails that fade behind
  * them.
  *
  * Each star is seeded below the bottom edge and drifts upward with a slight
@@ -23,7 +23,7 @@ export default function FadingStars({
   speed = 1,
   trail = 1,
   size = 1,
-  colors = ["#ffffff", "#8b7cff", "#7fe3ff", "#ffd48a"],
+  colors = ["#ffffff", "#92acff", "#f3f298", "#ffefb4"],
   opacity = 1,
   className = "",
   style,
@@ -52,7 +52,13 @@ export default function FadingStars({
 
     const rgb = colorKey.split(",").map((hex) => {
       const h = hex.replace("#", "");
-      const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+      const full =
+        h.length === 3
+          ? h
+              .split("")
+              .map((c) => c + c)
+              .join("")
+          : h;
       const n = parseInt(full, 16);
       return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
     });
@@ -78,7 +84,9 @@ export default function FadingStars({
         x: Math.random() * width,
         // `seeded` spreads the first frame over the whole frame; afterwards
         // stars re-enter from beyond the bottom edge.
-        y: seeded ? Math.random() * height : height + 20 + Math.random() * height * 0.4,
+        y: seeded
+          ? Math.random() * height
+          : height + 20 + Math.random() * height * 0.4,
         vy: (14 + depth * 46) * near * speed,
         sway: (Math.random() - 0.5) * 11,
         phase: Math.random() * TAU,
@@ -94,7 +102,10 @@ export default function FadingStars({
       // Scale the population to the area so a slim band is not as busy as a
       // full-height hero.
       const area = (width * height) / (1440 * 900);
-      const n = Math.max(14, Math.round(count * Math.min(1.25, Math.max(0.3, area))));
+      const n = Math.max(
+        14,
+        Math.round(count * Math.min(1.25, Math.max(0.3, area))),
+      );
       stars = Array.from({ length: n }, () => makeStar(true));
     };
 
@@ -175,7 +186,7 @@ export default function FadingStars({
       (entries) => {
         visible = entries[0]?.isIntersecting ?? true;
       },
-      { threshold: 0 }
+      { threshold: 0 },
     );
     observer.observe(wrap);
 
@@ -222,7 +233,12 @@ export default function FadingStars({
   }, [count, speed, trail, size, colorKey, opacity, reduced]);
 
   return (
-    <div ref={wrapRef} className={`fading-stars ${className}`} style={style} aria-hidden="true">
+    <div
+      ref={wrapRef}
+      className={`fading-stars ${className}`}
+      style={style}
+      aria-hidden="true"
+    >
       <canvas ref={canvasRef} style={{ display: "block" }} />
     </div>
   );

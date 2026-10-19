@@ -1,0 +1,247 @@
+/* Journal cover art. Colours come from the cover's tone (.tone-x). */
+
+.post-cover {
+  position: relative;
+  overflow: hidden;
+  border-radius: calc(var(--radius) - 4px);
+  isolation: isolate;
+}
+
+/* A soft light from the top corner and a fine diagonal weave. */
+.post-cover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(120% 90% at 85% 0%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%),
+    repeating-linear-gradient(135deg, transparent 0 16px, color-mix(in srgb, var(--fg) 6%, transparent) 16px 17px);
+}
+
+.post-cover-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 7% 6% 4%;
+  overflow: visible;
+}
+
+.post-cover-cat,
+.post-cover-time {
+  position: absolute;
+  top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px 6px 9px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--bg) 70%, black 8%);
+  border: 1px solid color-mix(in srgb, var(--fg) 22%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-family: var(--font-star);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.post-cover-cat {
+  left: 14px;
+}
+
+.post-cover-time {
+  right: 14px;
+  padding: 6px 12px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 11px;
+}
+
+.cat-icon {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ── Drawing primitives ── */
+.pc-line {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pc-thin { stroke-width: 2.5; }
+.pc-thick { stroke-width: 6; }
+.pc-faint { opacity: 0.3; stroke-width: 2; }
+.pc-acc-stroke { stroke: var(--accent); }
+
+.pc-fill { fill: var(--fg); }
+.pc-soft { fill: var(--fg); opacity: 0.14; }
+.pc-acc { fill: var(--accent); }
+.pc-on-fill { fill: var(--bg); }
+.pc-on-acc { fill: var(--on-accent); }
+
+.pc-dash {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 2 12;
+  animation: pc-march 1.4s linear infinite;
+}
+
+.pc-ring {
+  stroke-width: 2.5;
+  stroke-dasharray: 6 10;
+  opacity: 0.55;
+}
+
+.pc-tick {
+  fill: none;
+  stroke: var(--on-accent);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pc-glyph {
+  font-family: var(--font-chomp);
+  font-size: 58px;
+  text-anchor: middle;
+  fill: var(--accent);
+}
+
+.pc-label {
+  font-family: var(--font-seatren);
+  font-stretch: 80%;
+  font-weight: 800;
+  font-size: 22px;
+  text-anchor: middle;
+}
+
+.pc-mini {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-anchor: middle;
+}
+
+.pc-text { fill: var(--fg); }
+.pc-on-fill-text { fill: var(--bg); }
+.pc-on-acc-text { fill: var(--on-accent); }
+
+@keyframes pc-march {
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+
+/* ── Hover motion: every scene has something that moves ── */
+.pc-lift,
+.pc-bob,
+.pc-pop,
+.pc-grow,
+.pc-rise,
+.pc-spin,
+.pc-scan,
+.pc-twinkle,
+.pc-draw {
+  transform-box: fill-box;
+  transition: transform 700ms var(--ease-out), opacity 500ms ease;
+}
+
+.pc-spin {
+  transform-box: view-box;
+  transform-origin: 200px 125px;
+}
+
+.pc-grow {
+  transform-origin: 0% 100%;
+}
+
+.pc-rise {
+  transform-origin: 50% 100%;
+  transition-delay: calc(var(--i, 0) * 60ms);
+}
+
+.pc-pop,
+.pc-twinkle {
+  transform-origin: center;
+}
+
+.pc-draw {
+  stroke-dasharray: 600;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 900ms var(--ease-out);
+}
+
+.pc-scan {
+  animation: pc-scan 2.6s ease-in-out infinite;
+}
+
+@keyframes pc-scan {
+  50% {
+    transform: translateY(92px);
+  }
+}
+
+.pc-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pc-pulse 2s ease-in-out infinite;
+}
+
+@keyframes pc-pulse {
+  50% {
+    transform: scale(1.25);
+    opacity: 0.6;
+  }
+}
+
+.is-hover-art:hover .pc-lift,
+.is-hover-art:focus-visible .pc-lift {
+  transform: translateY(-10px);
+}
+
+.is-hover-art:hover .pc-bob {
+  transform: translateY(-8px) rotate(-4deg);
+}
+
+.is-hover-art:hover .pc-pop {
+  transform: scale(1.18);
+}
+
+.is-hover-art:hover .pc-grow {
+  transform: scale(1.06);
+}
+
+.is-hover-art:hover .pc-rise {
+  transform: scaleY(1.12);
+}
+
+.is-hover-art:hover .pc-spin {
+  transform: rotate(90deg);
+}
+
+.is-hover-art:hover .pc-twinkle {
+  transform: scale(1.4) rotate(45deg);
+}
+
+.is-hover-art:hover .pc-draw {
+  animation: pc-redraw 1.1s var(--ease-out);
+}
+
+@keyframes pc-redraw {
+  from {
+    stroke-dashoffset: 600;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}

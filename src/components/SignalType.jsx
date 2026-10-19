@@ -16,10 +16,10 @@ import "./signal-type.css";
  *
  * Fails lit, never dark. The CSS resting state is the LIT sign; the unlit
  * outline is only applied once we have committed to animating ("armed"), and a
- * timer lights the sign regardless if the viewport observer never reports — so
+ * timer lights the sign regardless if the viewport observer never reports - so
  * a missed IntersectionObserver callback costs the flicker, not the headline.
  *
- * Decorative by default — the letters are aria-hidden and the wrapper carries
+ * Decorative by default - the letters are aria-hidden and the wrapper carries
  * no label, so pages that already have a real heading (e.g. the sr-only <h1> on
  * Home) are announced exactly once. Pass `label` to expose the text instead.
  */
@@ -71,8 +71,13 @@ export default function SignalType({
   const chars = useMemo(() => {
     const list = [...text];
     const seed = seedFrom(text);
-    const letterIdx = list.map((c, i) => (c.trim() ? i : -1)).filter((i) => i >= 0);
-    const sequence = order === "random" ? shuffledOrder(letterIdx.length, seed) : letterIdx.map((_, i) => i);
+    const letterIdx = list
+      .map((c, i) => (c.trim() ? i : -1))
+      .filter((i) => i >= 0);
+    const sequence =
+      order === "random"
+        ? shuffledOrder(letterIdx.length, seed)
+        : letterIdx.map((_, i) => i);
 
     // position in the ignite sequence, keyed by index in the original string
     const slot = new Map();
@@ -130,12 +135,15 @@ export default function SignalType({
           >
             <span
               className="st-char-inner"
-              style={{ "--st-delay": `${c.delay}s`, "--st-dur": `${duration}s` }}
+              style={{
+                "--st-delay": `${c.delay}s`,
+                "--st-dur": `${duration}s`,
+              }}
             >
               {c.char}
             </span>
           </span>
-        )
+        ),
       )}
     </Tag>
   );
